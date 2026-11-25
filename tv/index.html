@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=1920">
+<link rel="icon" href="data:,">
+<title>Ingram Command · TV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700;800&family=JetBrains+Mono:wght@600;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#020409;--panel:#07101f;--line:rgba(70,140,255,.28);--blue:#2f8cff;--azure:#36c8ff;--chrome:#d7dee8;--dim:#8a97ab;--fuchsia:#ff2bd6;--green:#2ee59d;--amber:#ffb020;--red:#ff3b4e;--gray:#5d6676}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1920px;height:1080px;overflow:hidden;background:var(--bg);color:var(--chrome);font-family:'Barlow Semi Condensed',system-ui,sans-serif}
+body{background:radial-gradient(1200px 600px at 50% -10%,rgba(47,140,255,.16),transparent 70%),radial-gradient(800px 500px at 100% 110%,rgba(255,43,214,.06),transparent 70%),var(--bg)}
+#wrap{position:absolute;inset:0;padding:22px 30px;transition:transform 2s}
+.grid-bg{position:absolute;inset:0;background-image:linear-gradient(rgba(47,140,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(47,140,255,.05) 1px,transparent 1px);background-size:48px 48px;pointer-events:none}
+.mono{font-family:'JetBrains Mono',monospace}
+/* top strip */
+#top{display:flex;align-items:stretch;gap:18px;height:128px}
+#brand{width:330px;display:flex;flex-direction:column;justify-content:center}
+#brand .logo{font-family:Orbitron,sans-serif;font-weight:900;font-size:26px;letter-spacing:1.5px;white-space:nowrap;background:linear-gradient(180deg,#fff,#9fb3cc 55%,#e8eef6);-webkit-background-clip:text;background-clip:text;color:transparent}
+#brand .clock{font-size:46px;font-weight:700;color:#fff;line-height:1.05}
+#brand .date{font-size:28px;color:var(--dim)}
+.kpi{flex:1;border:1px solid var(--line);background:linear-gradient(180deg,rgba(14,28,52,.9),rgba(5,10,20,.9));border-radius:14px;padding:12px 20px;position:relative;overflow:hidden}
+.kpi:before{content:'';position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--c)}
+.kpi .lab{font-size:28px;font-weight:700;letter-spacing:2px;color:var(--dim);text-transform:uppercase}
+.kpi .val{font-family:'JetBrains Mono',monospace;font-size:62px;font-weight:800;color:var(--c);line-height:1}
+.kpi .sub{font-size:28px;color:var(--chrome);margin-left:12px;font-weight:600;white-space:nowrap}
+.kpi>div:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kpi.hot{box-shadow:0 0 28px rgba(255,43,214,.35);border-color:rgba(255,43,214,.6)}
+/* main */
+#main{display:flex;gap:20px;margin-top:18px;height:736px}
+#tiles{flex:1;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(4,1fr);gap:14px}
+.tile{border:1px solid var(--line);border-radius:14px;padding:14px 18px;background:linear-gradient(160deg,rgba(16,32,60,.85),rgba(4,8,16,.92));position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between}
+.tile:after{content:'';position:absolute;left:0;right:0;top:0;height:5px;background:var(--c)}
+.tile .nm{font-size:30px;letter-spacing:-.3px;font-weight:800;color:#fff;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .ln{font-size:28px;color:var(--chrome);line-height:1.1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tile .st{font-size:28px;font-weight:800;letter-spacing:1.5px;color:var(--c);display:flex;justify-content:space-between;align-items:center}
+.tile .st small{font-size:28px;font-weight:600;color:var(--dim);letter-spacing:0;white-space:nowrap}
+.tile .st{white-space:nowrap}
+.tile.nofeed{opacity:.55}.tile.nofeed .nm{color:var(--dim)}
+.tile.hot{border-color:rgba(255,43,214,.55);box-shadow:inset 0 0 40px rgba(255,43,214,.12)}
+.tile.down{border-color:rgba(255,59,78,.7);animation:pulse 2s infinite}
+@keyframes pulse{50%{box-shadow:inset 0 0 50px rgba(255,59,78,.3)}}
+#rail{width:600px;display:flex;flex-direction:column;gap:16px}
+.box{border:1px solid var(--line);border-radius:14px;background:rgba(5,10,20,.85);padding:14px 18px;flex:1;overflow:hidden}
+.box h2{font-size:30px;font-weight:800;letter-spacing:2px;display:flex;justify-content:space-between;color:var(--c);margin-bottom:6px}
+.box h2 span{color:var(--dim);font-weight:600;letter-spacing:0}
+.item{display:flex;align-items:center;gap:12px;font-size:28px;line-height:1.15;padding:7px 0;border-top:1px solid rgba(70,140,255,.14)}
+.item .tx{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#eef3fa}
+.chip{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:800;padding:2px 10px;border-radius:8px;border:2px solid var(--dim);color:var(--dim);white-space:nowrap}
+.chip.amber{border-color:var(--amber);color:var(--amber)}.chip.red{border-color:var(--red);color:var(--red);background:rgba(255,59,78,.12)}
+.empty{font-size:28px;color:var(--dim);padding-top:10px}
+/* bottom roster */
+#bottom{margin-top:16px;height:118px;display:flex;gap:12px;align-items:stretch}
+#rosterlab{width:150px;font-size:28px;font-weight:800;color:var(--dim);letter-spacing:2px;display:flex;flex-direction:column;justify-content:center;line-height:1.05}
+#roster{flex:1;display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:1fr 1fr;gap:8px}
+.ag{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:10px;padding:0 12px;background:rgba(8,16,32,.8);font-size:28px;font-weight:700;color:#fff;overflow:hidden;white-space:nowrap}
+.ag i{width:18px;height:18px;border-radius:50%;background:var(--c);flex:none;box-shadow:0 0 12px var(--c)}
+.ag span{color:var(--dim);font-weight:600;margin-left:auto}
+.ag.quiet{color:var(--dim)}.ag.quiet i{box-shadow:none}
+/* banners */
+#banner{position:absolute;left:50%;top:6px;transform:translateX(-50%);padding:6px 26px;border-radius:10px;font-size:28px;font-weight:800;letter-spacing:2px;display:none;z-index:5}
+#banner.stale{display:block;background:rgba(255,176,32,.16);border:2px solid var(--amber);color:var(--amber)}
+#banner.err{display:block;background:rgba(255,59,78,.18);border:2px solid var(--red);color:var(--red)}
+#foot{position:absolute;right:30px;bottom:6px;font-size:20px;color:var(--gray)}
+#setup{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:20px;font-size:40px;background:var(--bg);z-index:9}
+</style></head>
+<body>
+<div class="grid-bg"></div>
+<div id="banner"></div>
+<div id="setup"><div style="font-family:Orbitron;font-size:56px">INGRAM COMMAND</div><div id="setupmsg">Open this board with its private link (it ends in #k=…).</div></div>
+<div id="wrap">
+ <div id="top">
+  <div id="brand"><div class="logo">INGRAM COMMAND</div><div class="clock mono" id="clock">--:--</div><div class="date" id="date"></div></div>
+  <div class="kpi" id="k-needs" style="--c:var(--fuchsia)"><div class="lab">Needs Joe</div><div><span class="val" id="v-needs">–</span><span class="sub" id="s-needs"></span></div></div>
+  <div class="kpi" id="k-blocked" style="--c:var(--red)"><div class="lab">Blocked</div><div><span class="val" id="v-blocked">–</span><span class="sub" id="s-blocked"></span></div></div>
+  <div class="kpi" id="k-agents" style="--c:var(--azure)"><div class="lab">Agents working</div><div><span class="val" id="v-agents">–</span><span class="sub" id="s-agents"></span></div></div>
+  <div class="kpi" id="k-sites" style="--c:var(--green)"><div class="lab">Sites up</div><div><span class="val" id="v-sites">–</span><span class="sub" id="s-sites"></span></div></div>
+  <div class="kpi" id="k-feed" style="--c:var(--green)"><div class="lab">Feed health</div><div><span class="val" id="v-feed">–</span><span class="sub" id="s-feed"></span></div></div>
+ </div>
+ <div id="main">
+  <div id="tiles"></div>
+  <div id="rail">
+   <div class="box" style="--c:var(--fuchsia)"><h2>NEEDS JOE <span id="n-needs"></span></h2><div id="needs"></div></div>
+   <div class="box" style="--c:var(--red)"><h2>BLOCKED <span id="n-blocked"></span></h2><div id="blocked"></div></div>
+  </div>
+ </div>
+ <div id="bottom"><div id="rosterlab">WHO'S<br>WORKING</div><div id="roster"></div></div>
+</div>
+<div id="foot" class="mono"></div>
+<script src="../common.js"></script>
+<script>
+const $=id=>document.getElementById(id), E=CC.esc;
+const COL={site_ok:'var(--green)',needs_joe:'var(--fuchsia)',waiting:'var(--amber)',building:'var(--azure)',backlog:'var(--blue)',no_feed:'var(--gray)',down:'var(--red)'};
+const LAB={site_ok:'SITE UP',needs_joe:'NEEDS JOE',waiting:'WAITING',building:'IN MOTION',backlog:'BACKLOG',no_feed:'NO FEED',down:'SITE DOWN'};
+const ST={working:'var(--green)',idle:'var(--amber)',quiet:'var(--gray)'};
+let LAST=null, LASTOK=0, FAILS=0;
+function tick(){$('clock').textContent=CC.clock();$('date').textContent=CC.date();
+  if(LASTOK&&Date.now()-LASTOK>5*60e3){showBanner('err','FEED OFFLINE · LAST GOOD '+CC.ago(new Date(LASTOK).toISOString()).toUpperCase());}}
+function showBanner(cls,txt){const b=$('banner');b.className=cls||'';b.textContent=txt||'';}
+function render(f){
+  const D=CC.derive(f), I=f.ideas||{}, C=f.content||{}, Ph=f.phone||{}, Sa=f.sales||{};
+  // KPIs
+  $('v-needs').textContent=D.needs.data?D.needsItems.length:'–';
+  $('s-needs').textContent=D.needs.data?'open asks':'NO FEED';
+  $('k-needs').classList.toggle('hot',D.needsItems.length>0);
+  $('v-blocked').textContent=D.blocked.data?D.blockedItems.length:'–';$('s-blocked').textContent=D.blocked.data?'open':'NO FEED';
+  $('v-agents').textContent=D.agents.data?D.working:'–';$('s-agents').textContent=D.agents.data?'of '+D.roster.length:'NO FEED';
+  const sUp=D.sitesUp,sT=D.sitesTotal;$('v-sites').textContent=sT?sUp+'/'+sT:'–';
+  $('k-sites').style.setProperty('--c',!sT?'var(--gray)':sUp<sT?'var(--red)':'var(--green)');
+  $('s-sites').textContent=D.sites.data?(sUp<sT?'DOWN':'live'):'NO FEED';
+  $('v-feed').textContent=D.freshN+'/'+D.fresh.length;
+  $('k-feed').style.setProperty('--c',D.freshN===D.fresh.length?'var(--green)':D.freshN>=D.fresh.length-2?'var(--amber)':'var(--red)');
+  $('s-feed').textContent=D.freshN===D.fresh.length?'fresh':'stale: '+D.staleList.join(', ').replace(/_/g,' ');
+  // tiles
+  const tiles=D.tiles.slice(0,14).map(b=>{const c=COL[b.status]||'var(--gray)';
+    const site=b.site_total?(b.down.length?b.down.length+' site down':b.site_up+'/'+b.site_total+' up'):'';
+    return `<div class="tile ${b.status==='no_feed'?'nofeed':''} ${b.status==='needs_joe'?'hot':''} ${b.status==='down'?'down':''}" style="--c:${c}">
+      <div class="nm">${E(b.name)}</div><div class="ln">${E(b.status==='down'?b.down.join(', '):b.line)}</div>
+      <div class="st">${LAB[b.status]||'NO FEED'}<small>${E(site)}</small></div></div>`;});
+  if(!D.biz.data) for(let i=0;i<14;i++) tiles.push('<div class="tile nofeed" style="--c:var(--gray)"><div class="nm">NO FEED</div><div class="ln">Business status not connected</div><div class="st">NO FEED</div></div>');
+  const pipeTxt=I.total!=null?`${I.awaiting} awaiting · ${I.motion} in motion`:'NO FEED';
+  tiles.push(`<div class="tile" style="--c:var(--fuchsia)"><div class="nm">IdeaQ + Content</div><div class="ln">${E(pipeTxt)}<br>${C.awaiting_joe!=null?C.awaiting_joe+' content cards for Joe':''}</div><div class="st">PIPELINE<small>${I.done!=null?I.done+' done':''}</small></div></div>`);
+  tiles.push(`<div class="tile" style="--c:var(--green)"><div class="nm">Sales today</div><div class="ln"><span class="mono" style="font-size:44px;font-weight:800;color:#fff">${CC.money(Sa.total_today)}</span> · ${Sa.count_today||0} paid</div><div class="st">MTD ${CC.money(Sa.mtd)}<small>${Ph.today??'–'} call tries</small></div></div>`);
+  $('tiles').innerHTML=tiles.slice(0,16).join('');
+  // rail
+  const list=(arr,el,n,emptyTxt,feed)=>{$(n).textContent=feed.data?arr.length+' total':'';
+    $(el).innerHTML=!feed.data?'<div class="empty">NO FEED</div>':arr.length?arr.slice(0,5).map(x=>{const d=CC.days(x.since);
+      return `<div class="item"><div class="tx">${E(x.text)}</div>${d!=null?`<span class="chip ${CC.ageClass(d)}">${d}d</span>`:''}</div>`}).join(''):`<div class="empty">${emptyTxt}</div>`;};
+  list(D.needsItems,'needs','n-needs','Nothing waiting on Joe',D.needs);
+  list(D.blockedItems,'blocked','n-blocked','Nothing blocked',D.blocked);
+  // roster
+  $('roster').innerHTML=D.agents.data?D.roster.map(r=>`<div class="ag ${r.state}" style="--c:${ST[r.state]}" title="${E(r.doing||'')}"><i></i>${E(r.name)}<span>${r.last_at?CC.ago(r.last_at).replace(' ago',''):'–'}</span></div>`).join('')
+    :'<div class="ag quiet" style="--c:var(--gray);grid-column:1/-1"><i></i>Agent activity NO FEED</div>';
+  // stale banner
+  if(D.staleList.length) showBanner('stale','STALE DATA · '+D.staleList.join(' · ').replace(/_/g,' ').toUpperCase()); else showBanner('','');
+  $('foot').textContent='Updated '+CC.time(f.generated_at,{hour:'numeric',minute:'2-digit',second:'2-digit'})+' PT · refresh 60s · sites checked '+(D.sites.data?CC.ago(D.sites.data.checked_at):'–')+' · Relay row '+(D.relay.data&&D.relay.data.tail_row||'–')+' · agents '+(D.agents.data?CC.ago(D.agents.updated_at):'–');
+  document.body.dataset.ready='1';
+}
+async function pull(){
+  try{const f=await CC.load();LAST=f;LASTOK=Date.now();FAILS=0;$('setup').style.display='none';render(f);}
+  catch(e){FAILS++;
+    if(e.code==='nokey'||e.code==='badkey'){$('setup').style.display='flex';$('setupmsg').textContent=e.code==='badkey'?'This link\'s key was rejected. Ask Benjamin for the current TV link.':'Open this board with its private link (it ends in #k=…).';}
+    else if(!LAST) showBanner('err','CONNECTING TO FEED… ('+e.message+')');
+    document.body.dataset.ready='err';}
+}
+tick();setInterval(tick,1000);pull();setInterval(pull,60e3);
+// burn-in guard: drift the whole board a few pixels every 4 minutes
+let dk=0;const DR=[[0,0],[4,3],[-3,4],[3,-4],[-4,-3],[2,2]];setInterval(()=>{dk=(dk+1)%DR.length;$('wrap').style.transform=`translate(${DR[dk][0]}px,${DR[dk][1]}px)`},240e3);
+// full reload every 6 hours picks up new code
+setTimeout(()=>location.reload(),6*3600e3);
+// fit to any screen size: scale the 1920x1080 board
+function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);document.documentElement.style.transformOrigin='0 0';document.documentElement.style.transform=s<0.999||s>1.001?`scale(${s})`:'';}
+addEventListener('resize',fit);fit();
+</script>
+</body></html>
