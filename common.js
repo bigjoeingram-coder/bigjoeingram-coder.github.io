@@ -38,6 +38,21 @@ CC.snap=function(feed,name,limitH){const s=feed&&feed.snapshots&&feed.snapshots[
   if(!s||!s.data) return {data:null,state:'nofeed',source:'not connected'};
   return Object.assign({},s,{state:CC.hours(s.updated_at)>(limitH||0.75)?'stale':'live'});};
 CC.ageClass=d=>d==null?'':d>=7?'red':d>=3?'amber':'';
+/* PT calendar day-zero: 0 = the date is today in America/Los_Angeles */
+CC.crmDays=function(d){
+  if(!d) return null;
+  const iso=d.length===10?d+'T12:00:00-08:00':d;
+  const fmt=x=>new Date(x).toLocaleDateString('en-CA',{timeZone:CC.TZ});
+  const a=fmt(iso), b=fmt(Date.now());
+  if(a==='Invalid Date'||b==='Invalid Date') return null;
+  return Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/864e5);
+};
+CC.dayChip=function(d){
+  if(d==null) return '<span class="chip">?</span>';
+  const cls=d>=3?'red':d===2?'amber':'';
+  return '<span class="chip '+cls+'">'+d+'d</span>';
+};
+
 /* shared derivations so TV and desktop show the same numbers */
 CC.derive=function(f){
   const S=n=>CC.snap(f,n,n==='sites'?0.5:0.75);
@@ -47,8 +62,8 @@ CC.derive=function(f){
   const reg=registry.data||{};
   const tiles=(biz.data?biz.data.items:[]).map(b=>{const hosts=b.sites||[];const ss=sitesL.filter(s=>hosts.includes(s.host));const down=ss.filter(s=>!s.up);
     let st=b.status;if(down.length)st='down';else if(st==='no_feed'&&ss.length)st='site_ok';return Object.assign({},b,{status:st,site_up:ss.length-down.length,site_total:ss.length,down:down.map(s=>s.host)});});
-  const fresh=['needs_joe','blocked','agents','sites','businesses','relay','projects'].map(n=>({n,s:S(n)}));
-  return {needs,blocked,agents,sites,biz,relay,projects,registry,roster,tiles,sitesL,reg,
+  const action=S('action'), fresh=['needs_joe','blocked','agents','sites','businesses','relay','projects','action'].map(n=>({n,s:S(n)}));
+  return {needs,blocked,agents,sites,biz,relay,projects,registry,action,roster,tiles,sitesL,reg,
     needsItems:needs.data?needs.data.items:[],blockedItems:blocked.data?blocked.data.items:[],
     working:roster.filter(r=>r.state==='working').length,active:roster.filter(r=>r.state!=='quiet').length,
     sitesUp:sitesL.filter(s=>s.up).length,sitesTotal:sitesL.length,
