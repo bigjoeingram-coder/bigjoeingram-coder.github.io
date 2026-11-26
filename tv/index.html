@@ -66,6 +66,20 @@ body{background:radial-gradient(1200px 500px at 20% -10%,rgba(255,59,78,.12),tra
 .ag i{width:18px;height:18px;border-radius:50%;background:var(--c);box-shadow:0 0 10px var(--c);flex:none}
 .ag.quiet i{box-shadow:none;opacity:.85}
 .ag.quiet .nm{color:var(--dim)}
+#genius-bar{flex:none;height:52px;display:flex;align-items:center;gap:14px;padding:0 16px;border-radius:14px;border:1px solid rgba(54,200,255,.32);background:rgba(5,12,24,.94);overflow:hidden}
+#genius-bar .g-brand{font-family:Orbitron,sans-serif;font-weight:900;font-size:28px;letter-spacing:1.5px;color:var(--azure);white-space:nowrap;flex:none}
+#genius-bar .g-pill{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:28px;padding:2px 12px;border-radius:8px;border:2px solid var(--dim);color:var(--chrome);background:rgba(255,255,255,.04);white-space:nowrap;flex:none;text-transform:uppercase}
+#genius-bar .g-pill.listening{border-color:var(--green);color:var(--green);background:rgba(46,229,157,.14)}
+#genius-bar .g-pill.transcribing{border-color:var(--azure);color:var(--azure);background:rgba(54,200,255,.14)}
+#genius-bar .g-pill.sent{border-color:var(--green);color:#fff;background:rgba(46,229,157,.22)}
+#genius-bar .g-pill.missed{border-color:var(--amber);color:var(--amber);background:rgba(255,176,32,.14)}
+#genius-bar .g-list{flex:1;min-width:0;display:flex;align-items:center;gap:18px;overflow:hidden;white-space:nowrap}
+#genius-bar .g-item{display:inline-flex;align-items:center;gap:8px;white-space:nowrap;overflow:hidden;max-width:620px;flex:none}
+#genius-bar .g-tm{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:28px;color:var(--dim);flex:none}
+#genius-bar .g-seat{font-weight:800;font-size:28px;color:var(--green);flex:none}
+#genius-bar .g-txt{font-size:28px;color:var(--chrome);overflow:hidden;text-overflow:ellipsis}
+#genius-bar .g-sep{color:var(--gray);font-size:28px;flex:none}
+#genius-bar .g-empty{font-size:28px;color:var(--dim);font-weight:700}
 #foot{flex:none;font-family:'JetBrains Mono',monospace;font-size:28px;color:var(--gray);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;height:40px;line-height:40px}
 #setup{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:20px;font-size:40px;background:var(--bg);z-index:9}
 </style></head>
@@ -90,6 +104,7 @@ body{background:radial-gradient(1200px 500px at 20% -10%,rgba(255,59,78,.12),tra
       <div id="roster"></div>
     </div>
   </div>
+  <div id="genius-bar"><div class="g-brand">HEY GENIUS</div><div class="g-pill" id="g-state">IDLE</div><div class="g-list" id="g-list"><span class="g-empty">Waiting for Hey Genius…</span></div></div>
   <div id="foot"></div>
 </div>
 <!-- test hooks: counts stay in the DOM even though the old KPI strip is gone -->
@@ -213,6 +228,31 @@ function render(f){
     <div class="nm">${E(r.name)}</div><i></i></div>`).join('')
     :'<div class="ag quiet" style="--c:var(--gray);grid-column:1/-1"><div class="nm">NO FEED</div><i></i></div>';
 
+  /* Hey Genius live strip */
+  const gSnap=f.snapshots&&f.snapshots.genius&&f.snapshots.genius.data;
+  const gStEl=$('g-state'), gListEl=$('g-list');
+  if(!gSnap){
+    gStEl.className='g-pill'; gStEl.textContent='NO FEED';
+    gListEl.innerHTML='<span class="g-empty">PC listener offline or not yet synced</span>';
+  }else{
+    const stRaw=String(gSnap.state||'Idle');
+    const stLow=stRaw.toLowerCase();
+    let cls='g-pill';
+    if(stLow.includes('listen')) cls+=' listening';
+    else if(stLow.includes('transcrib')) cls+=' transcribing';
+    else if(stLow.includes('sent')) cls+=' sent';
+    else if(stLow.includes('miss')) cls+=' missed';
+    gStEl.className=cls;
+    gStEl.textContent=stRaw.toUpperCase();
+    const items=(gSnap.dispatches||[]).slice(0,3);
+    const shortPt=t=>{const m=String(t||'').match(/(\d{4}-\d{2}-\d{2})\s+(\d{2}):(\d{2}):\d{2}\s*(\w+)?/);if(!m)return String(t||'');let h=+m[2];const ap=h>=12?'PM':'AM';h=h%12||12;return `${h}:${m[3]} ${ap} ${m[4]||'PT'}`;};
+    gListEl.innerHTML=items.length?items.map((x,idx)=>{
+      const snip=String(x.text||'').replace(/\s+/g,' ').trim();
+      const shortTxt=snip.length>38?snip.slice(0,37)+'…':snip;
+      return `${idx?'<span class="g-sep">·</span>':''}<span class="g-item"><span class="g-tm">${E(shortPt(x.time_pt))}</span><span class="g-seat">${E(x.seat||'Benjamin')}</span><span class="g-txt">${E(shortTxt)}</span></span>`;
+    }).join(''):'<span class="g-empty">No dispatches yet today</span>';
+  }
+
   /* test hooks + stale */
   $('v-needs').textContent=needN;
   $('v-blocked').textContent=pushN;
@@ -220,7 +260,7 @@ function render(f){
   $('v-sites').textContent=D.sitesTotal?D.sitesUp+'/'+D.sitesTotal:'–';
   $('v-feed').textContent=D.freshN+'/'+D.fresh.length;
   if(D.staleList.length) showBanner('stale','STALE DATA · '+D.staleList.join(' · ').replace(/_/g,' ').toUpperCase()); else showBanner('','');
-  $('foot').textContent='Updated '+CC.time(f.generated_at,{hour:'numeric',minute:'2-digit',second:'2-digit'})+' PT · refresh 60s · Relay row '+(D.relay.data&&D.relay.data.tail_row||'–')+' · ? = no recorded date or % · day 0 = today';
+  $('foot').textContent='Updated '+CC.time(f.generated_at,{hour:'numeric',minute:'2-digit',second:'2-digit'})+' PT · refresh 10s · Relay row '+(D.relay.data&&D.relay.data.tail_row||'–')+' · ? = no recorded date or % · day 0 = today';
   document.body.dataset.ready='1';
 }
 
@@ -231,7 +271,7 @@ async function pull(){
     else if(!LAST) showBanner('err','CONNECTING TO FEED… ('+e.message+')');
     document.body.dataset.ready='err';}
 }
-tick();setInterval(tick,1000);pull();setInterval(pull,60e3);
+tick();setInterval(tick,1000);pull();setInterval(pull,10e3);
 let dk=0;const DR=[[0,0],[4,3],[-3,4],[3,-4],[-4,-3],[2,2]];setInterval(()=>{dk=(dk+1)%DR.length;$('wrap').style.transform=`translate(${DR[dk][0]}px,${DR[dk][1]}px)`},240e3);
 setTimeout(()=>location.reload(),6*3600e3);
 function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);document.documentElement.style.transformOrigin='0 0';document.documentElement.style.transform=s<0.999||s>1.001?`scale(${s})`:'';}
