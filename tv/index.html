@@ -80,6 +80,17 @@ body{background:radial-gradient(1200px 500px at 20% -10%,rgba(255,59,78,.12),tra
 #genius-bar .g-txt{font-size:28px;color:var(--chrome);overflow:hidden;text-overflow:ellipsis}
 #genius-bar .g-sep{color:var(--gray);font-size:28px;flex:none}
 #genius-bar .g-empty{font-size:28px;color:var(--dim);font-weight:700}
+#mascot{position:relative;flex:none;height:330px;margin-top:8px;border-radius:12px;overflow:hidden;border:1px solid rgba(46,229,157,.25);background:#000}
+#mascot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 0;opacity:0;transition:opacity .9s ease}
+#mascot img.on{opacity:1}
+#mascot canvas{position:absolute;inset:0;width:100%;height:100%;mix-blend-mode:screen;pointer-events:none;opacity:.22;transition:opacity .9s ease;
+  -webkit-mask-image:linear-gradient(90deg,#000 0,#000 20%,transparent 36%,transparent 64%,#000 80%,#000 100%);mask-image:linear-gradient(90deg,#000 0,#000 20%,transparent 36%,transparent 64%,#000 80%,#000 100%)}
+#mascot[data-st="listening"] canvas{opacity:.6}
+#mascot[data-st="onit"] canvas{opacity:.95}
+#mascot[data-st="done"] canvas{opacity:.18}
+#mascot .m-cap{position:absolute;left:0;right:0;bottom:0;padding:4px 8px;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:28px;letter-spacing:2px;text-align:center;color:var(--green);background:linear-gradient(0deg,rgba(0,0,0,.85),rgba(0,0,0,0))}
+#mascot .m-test{position:absolute;top:6px;left:6px;font-family:'JetBrains Mono',monospace;font-weight:800;font-size:28px;color:#000;background:var(--amber);padding:0 8px;border-radius:6px;display:none}
+#mascot.test .m-test{display:block}
 #foot{flex:none;font-family:'JetBrains Mono',monospace;font-size:28px;color:var(--gray);text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;height:40px;line-height:40px}
 #setup{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:20px;font-size:40px;background:var(--bg);z-index:9}
 </style></head>
@@ -102,6 +113,7 @@ body{background:radial-gradient(1200px 500px at 20% -10%,rgba(255,59,78,.12),tra
     <div id="team">
       <div class="kicker">TEAM</div>
       <div id="roster"></div>
+      <div id="mascot" data-st="idle"><img id="m-idle" class="on" alt="Genius idle"><img id="m-onit" alt="Genius on it"><img id="m-done" alt="Genius done"><canvas id="m-rain" width="124" height="165"></canvas><div class="m-cap" id="m-cap">IDLE</div><div class="m-test">TEST</div></div>
     </div>
   </div>
   <div id="genius-bar"><div class="g-brand">HEY GENIUS</div><div class="g-pill" id="g-state">IDLE</div><div class="g-list" id="g-list"><span class="g-empty">Waiting for Hey Genius…</span></div></div>
@@ -112,6 +124,7 @@ body{background:radial-gradient(1200px 500px at 20% -10%,rgba(255,59,78,.12),tra
   <span id="v-needs"></span><span id="v-blocked"></span><span id="v-agents"></span><span id="v-sites"></span><span id="v-feed"></span>
 </div>
 <script src="../common.js"></script>
+<script src="../assets/genius-poses.js"></script>
 <script>
 const $=id=>document.getElementById(id), E=CC.esc;
 const ST={working:'var(--green)',idle:'var(--yellow)',quiet:'var(--red)'};
@@ -253,6 +266,9 @@ function render(f){
     }).join(''):'<span class="g-empty">No dispatches yet today</span>';
   }
 
+  /* Matrix Einstein mascot follows the genius feed */
+  if(window.GM) GM.feed(gSnap);
+
   /* test hooks + stale */
   $('v-needs').textContent=needN;
   $('v-blocked').textContent=pushN;
@@ -271,6 +287,51 @@ async function pull(){
     else if(!LAST) showBanner('err','CONNECTING TO FEED… ('+e.message+')');
     document.body.dataset.ready='err';}
 }
+/* Matrix Einstein: figure never moves, poses crossfade, code rain is a tiny canvas (low fps). */
+const GM=window.GM=(function(){
+  const P=window.GENIUS_POSES||{}, box=$('mascot'), cap=$('m-cap'), cv=$('m-rain'), cx=cv.getContext('2d');
+  ['idle','onit','done'].forEach(n=>{if(P[n])$('m-'+n).src=P[n];});
+  const q=new URLSearchParams(location.search), forced=(q.get('genius_test')||'').toLowerCase();
+  const TESTS={idle:1,listening:1,onit:1,done:1};
+  let st='', doneUntil=0, lastTop=null, seen=false;
+  const FPS={idle:5,listening:12,onit:20,done:5}, DENS={idle:.25,listening:.6,onit:1,done:.2};
+  const fs=10, cols=Math.floor(cv.width/fs), drops=Array.from({length:cols},()=>Math.random()*-20);
+  const G='アカサタナハマヤラワ0123456789ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘ';
+  let timer=null;
+  function frame(){
+    cx.fillStyle='rgba(0,0,0,.18)';cx.fillRect(0,0,cv.width,cv.height);
+    cx.font=fs+'px monospace';const d=DENS[st]||.25;
+    for(let i=0;i<cols;i++){
+      if(drops[i]<0||Math.random()<d){
+        const y=drops[i]*fs;if(y>0){cx.fillStyle=Math.random()<.1?'#c8ffd9':'#2ee59d';cx.fillText(G[(Math.random()*G.length)|0],i*fs,y);}
+      }
+      drops[i]+=1; if(drops[i]*fs>cv.height&&Math.random()>.95-d*.1) drops[i]=Math.random()*-10;
+    }
+  }
+  function set(s){
+    if(s===st) return; st=s; box.dataset.st=s;
+    const pose=s==='onit'?'onit':s==='done'?'done':'idle';
+    ['idle','onit','done'].forEach(n=>$('m-'+n).classList.toggle('on',n===pose));
+    cap.textContent={idle:'IDLE',listening:'LISTENING',onit:'ON IT',done:'DONE'}[s];
+    clearInterval(timer); timer=setInterval(frame,1000/(FPS[s]||5));
+  }
+  function feed(g){
+    if(forced&&TESTS[forced]){box.classList.add('test');set(forced);return;}
+    const now=Date.now(), stRaw=String(g&&g.state||'Idle').toLowerCase();
+    const top=g&&g.dispatches&&g.dispatches[0]?(g.dispatches[0].time_pt+'|'+g.dispatches[0].text):null;
+    if(seen&&top&&top!==lastTop) doneUntil=now+6000;   /* new dispatch since last poll */
+    lastTop=top; seen=true;
+    if(stRaw.startsWith('sent')&&doneUntil<now-6000) doneUntil=now+6000;
+    let s='idle';
+    if(stRaw.includes('listen')) s='listening';
+    else if(stRaw.includes('transcrib')) s='onit';
+    if(now<doneUntil) s='done';
+    set(s);
+    if(s==='done') setTimeout(()=>{if(Date.now()>=doneUntil&&!forced) set('idle');},doneUntil-now+50);
+  }
+  set(forced&&TESTS[forced]?forced:'idle'); if(forced&&TESTS[forced]) box.classList.add('test');
+  return {feed,set};
+})();
 tick();setInterval(tick,1000);pull();setInterval(pull,10e3);
 let dk=0;const DR=[[0,0],[4,3],[-3,4],[3,-4],[-4,-3],[2,2]];setInterval(()=>{dk=(dk+1)%DR.length;$('wrap').style.transform=`translate(${DR[dk][0]}px,${DR[dk][1]}px)`},240e3);
 setTimeout(()=>location.reload(),6*3600e3);
