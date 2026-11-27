@@ -20,7 +20,7 @@ body{background:radial-gradient(calc(1200*var(--u)) calc(500*var(--u)) at 20% -1
 #banner.stale{display:block;background:rgba(255,176,32,.16);border:calc(2*var(--u)) solid var(--amber);color:var(--amber)}
 #banner.err{display:block;background:rgba(255,59,78,.18);border:calc(2*var(--u)) solid var(--red);color:var(--red)}
 #stage{flex:1;min-height:0;display:flex;gap:calc(16*var(--u))}
-#cols{flex:1;min-width:0;display:grid;grid-template-columns:1.15fr 1fr 0.95fr;gap:calc(16*var(--u));min-height:0}
+#cols{flex:1;min-width:0;display:grid;grid-template-columns:1.65fr 1fr 0.55fr;gap:calc(14*var(--u));min-height:0}
 .col{border-radius:calc(18*var(--u));border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;min-height:0;overflow:hidden;position:relative;padding-bottom:calc(6*var(--u))}
 .col.red{background:linear-gradient(180deg,rgba(255,59,78,.16),rgba(12,4,8,.92) 28%);border-color:rgba(255,59,78,.4)}
 .col.work{background:linear-gradient(180deg,rgba(54,200,255,.14),rgba(4,10,18,.92) 28%);border-color:rgba(54,200,255,.35)}
@@ -58,10 +58,23 @@ body{background:radial-gradient(calc(1200*var(--u)) calc(500*var(--u)) at 20% -1
 .check.ok .val{color:var(--green)}
 .more{font-size:calc(28*var(--u));font-weight:800;color:var(--amber);padding:calc(8*var(--u)) calc(10*var(--u));letter-spacing:1px}
 .empty,.nofeedbox{font-size:calc(28*var(--u));color:var(--dim);padding:calc(16*var(--u)) calc(10*var(--u));font-weight:700}
+
+.col.green .hd{padding:calc(6*var(--u)) calc(10*var(--u)) calc(2*var(--u))}
+.col.green .body{padding:0 calc(8*var(--u)) calc(6*var(--u))}
+.col.green .check{padding:calc(4*var(--u)) calc(6*var(--u));gap:calc(2*var(--u))}
+.col.green .item{padding:calc(4*var(--u)) calc(6*var(--u))}
+.seatc{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:calc(28*var(--u));line-height:1;padding:0 calc(7*var(--u));border-radius:calc(8*var(--u));border:calc(2*var(--u)) solid var(--azure);color:var(--azure);background:rgba(54,200,255,.12);white-space:nowrap;letter-spacing:calc(0.5*var(--u));flex:none}
+.seatc.none{border-color:var(--dim);color:var(--dim);background:transparent;opacity:.8}
+#codes{flex:none;font-size:calc(28*var(--u));font-weight:650;color:var(--dim);line-height:1.15;letter-spacing:calc(0.2*var(--u));padding:calc(2*var(--u)) calc(8*var(--u));white-space:normal}
+#codes b{color:var(--azure);font-family:'JetBrains Mono',monospace;font-weight:800;padding-right:calc(4*var(--u))}
+.ag .sig{display:flex;align-items:center;gap:calc(6*var(--u));justify-content:center}
+.ag .ago{font-size:calc(28*var(--u));font-weight:650;color:var(--dim);line-height:1;white-space:nowrap}
+.col.red .hd{padding-bottom:calc(2*var(--u))}
+
 #team{width:calc(268*var(--u));flex:none;display:flex;flex-direction:column;border-radius:calc(18*var(--u));border:1px solid rgba(47,140,255,.28);background:rgba(5,10,20,.9);padding:calc(10*var(--u)) calc(10*var(--u)) calc(8*var(--u));min-height:0}
 #team .kicker{font-size:calc(28*var(--u));font-weight:800;letter-spacing:calc(2*var(--u));color:var(--dim);padding:calc(2*var(--u)) calc(6*var(--u)) calc(8*var(--u))}
-#roster{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(6,1fr);gap:calc(6*var(--u));min-height:0}
-.ag{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(6*var(--u));border-radius:calc(12*var(--u));border:1px solid rgba(255,255,255,.08);background:rgba(8,16,32,.8);padding:calc(4*var(--u)) calc(4*var(--u))}
+#roster{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(6,1fr);gap:calc(4*var(--u));min-height:0}
+.ag{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(3*var(--u));border-radius:calc(10*var(--u));border:1px solid rgba(255,255,255,.08);background:rgba(8,16,32,.8);padding:calc(2*var(--u)) calc(4*var(--u));min-height:0}
 .ag .nm{font-size:calc(28*var(--u));font-weight:800;color:#fff;line-height:1;white-space:nowrap;overflow:hidden;max-width:100%}
 .ag i{width:calc(18*var(--u));height:calc(18*var(--u));border-radius:50%;background:var(--c);box-shadow:0 0 calc(10*var(--u)) var(--c);flex:none}
 .ag.quiet i{box-shadow:none;opacity:.85}
@@ -80,7 +93,7 @@ body{background:radial-gradient(calc(1200*var(--u)) calc(500*var(--u)) at 20% -1
 #genius-bar .g-txt{font-size:calc(28*var(--u));color:var(--chrome);overflow:hidden;text-overflow:ellipsis}
 #genius-bar .g-sep{color:var(--gray);font-size:calc(28*var(--u));flex:none}
 #genius-bar .g-empty{font-size:calc(28*var(--u));color:var(--dim);font-weight:700}
-#mascot{position:relative;flex:none;height:calc(330*var(--u));margin-top:calc(8*var(--u));border-radius:calc(12*var(--u));overflow:hidden;border:1px solid rgba(46,229,157,.25);background:#000}
+#mascot{position:relative;flex:none;height:calc(250*var(--u));margin-top:calc(4*var(--u));border-radius:calc(12*var(--u));overflow:hidden;border:1px solid rgba(46,229,157,.25);background:#000}
 #mascot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 0;opacity:0;transition:opacity .9s ease}
 #mascot img.on{opacity:1}
 #mascot canvas{position:absolute;inset:0;width:100%;height:100%;mix-blend-mode:screen;pointer-events:none;opacity:.22;transition:opacity .9s ease;
@@ -117,7 +130,8 @@ body{background:radial-gradient(calc(1200*var(--u)) calc(500*var(--u)) at 20% -1
     </div>
   </div>
   <div id="genius-bar"><div class="g-brand">HEY GENIUS</div><div class="g-pill" id="g-state">IDLE</div><div class="g-list" id="g-list"><span class="g-empty">Waiting for Hey Genius…</span></div></div>
-  <div id="foot"></div>
+  <div id="codes"><b>LO</b>Louis · <b>DO</b>Donna · <b>NI</b>Nigel · <b>BE</b>Benjamin · <b>IR</b>Iris · <b>RA</b>Rachel · <b>EL</b>Elena · <b>KA</b>Katrina · <b>CX</b>Codex · <b>CY</b>Cody · <b>GE</b>Gene</div>
+    <div id="foot"></div>
 </div>
 <!-- test hooks: counts stay in the DOM even though the old KPI strip is gone -->
 <div style="position:absolute;left:-9999px;top:auto" aria-hidden="true">
@@ -128,6 +142,22 @@ body{background:radial-gradient(calc(1200*var(--u)) calc(500*var(--u)) at 20% -1
 <script>
 const $=id=>document.getElementById(id), E=CC.esc;
 const ST={working:'var(--green)',idle:'var(--yellow)',quiet:'var(--red)'};
+const SEAT={Louis:'LO',Donna:'DO',Nigel:'NI',Benjamin:'BE',Iris:'IR',Rachel:'RA',Elena:'EL',Data:'DA',Katrina:'KA',Codex:'CX',Cody:'CY',Gene:'GE'};
+function shortAgo(iso){
+  if(!iso) return '—';
+  const s=(Date.now()-new Date(iso))/1000;
+  if(s<90) return 'now';
+  if(s<3600) return Math.max(1,Math.round(s/60))+'m';
+  if(s<48*3600) return Math.max(1,Math.round(s/3600))+'h';
+  return Math.max(1,Math.round(s/86400))+'d';
+}
+function seatCode(x){
+  const c=(x&&x.contact)||'';
+  if(SEAT[c]) return SEAT[c];
+  if(x&&x.code&&/^[A-Z]{2}$/.test(x.code)) return x.code;
+  return '';
+}
+
 let LAST=null, LASTOK=0, FAILS=0;
 
 function tick(){$('clock').textContent=CC.clock();$('date').textContent=CC.date();
@@ -169,10 +199,10 @@ function render(f){
   if(I.awaiting>0){
     const oldest=(I.awaiting_list||[]).map(x=>x.since).filter(Boolean).sort()[0]||null;
     if(!needs.some(n=>/idea.?q|idea queue/i.test(n.name)&&/awaiting your tap|cards awaiting/i.test(n.name)))
-      needs.push({name:I.awaiting+' IdeaQ cards awaiting your tap', next:'Joe', since:oldest, src:'IdeaQ live', detail:null});
+      needs.push({name:I.awaiting+' IdeaQ cards awaiting your tap', next:'Joe', contact:'Benjamin', code:'BE', since:oldest, src:'IdeaQ live', detail:null});
   }
   if(C.awaiting_joe>0){
-    needs.push({name:C.awaiting_joe+' content cards awaiting you', next:'Joe', since:null, src:'Content board', detail:null});
+    needs.push({name:C.awaiting_joe+' content cards awaiting you', next:'Joe', contact:'Elena', code:'EL', since:null, src:'Content board', detail:null});
   }
   needs.sort((a,b)=>((a.since||'9999').localeCompare(b.since||'9999')));
   const push=(A.joe_to_push||[]).slice().sort((a,b)=>((a.since||'9999').localeCompare(b.since||'9999')));
@@ -181,9 +211,9 @@ function render(f){
 
   const needN=needs.length, pushN=push.length, redN=needN+pushN;
   const one=x=>{
-    const d=CC.crmDays(x.since); const joe=/^joe$/i.test(x.next||'');
+    const d=CC.crmDays(x.since); const code=seatCode(x);
     return `<div class="item one"><div class="nm">${E(x.name)}</div>
-      <div class="meta"><span class="who ${joe?'joe':''}">${E(x.next||'—')}</span>${CC.dayChip(d)}</div></div>`;
+      <div class="meta">${CC.dayChip(d)}${code?`<span class="seatc" title="${E(x.contact||'')}">${E(code)}</span>`:`<span class="seatc none">—</span>`}</div></div>`;
   };
   $('col-red').innerHTML=`
     <div class="hd"><div class="kicker">Red</div>
@@ -235,10 +265,10 @@ function render(f){
     <div class="body" id="green-body"></div>`;
   fillVisible($('green-body'), ghtml);
 
-  /* team strip: two wide, dot under the name. green=now, yellow=today, red=quiet */
+  /* team strip: two wide, dot under the name, last seen under the dot. green=3h, yellow=36h, red=older */
   const roster=D.agents.data?D.roster:[];
-  $('roster').innerHTML=D.agents.data?roster.map(r=>`<div class="ag ${r.state}" style="--c:${ST[r.state]}" title="${E(r.doing||'')}">
-    <div class="nm">${E(r.name)}</div><i></i></div>`).join('')
+  $('roster').innerHTML=D.agents.data?roster.map(r=>`<div class="ag ${r.state}" style="--c:${ST[r.state]}" title="${E((r.doing||'')+(r.src?' · '+r.src:''))}">
+    <div class="nm">${E(r.name)}</div><div class="sig"><i></i><div class="ago">${E(shortAgo(r.last_at))}</div></div></div>`).join('')
     :'<div class="ag quiet" style="--c:var(--gray);grid-column:1/-1"><div class="nm">NO FEED</div><i></i></div>';
 
   /* Hey Genius live strip */
