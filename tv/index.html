@@ -316,6 +316,7 @@ async function pull(){
     if(e.code==="nokey"||e.code==="badkey"){$("setup").style.display="flex";$("setupmsg").textContent=e.code==="badkey"?"This link's key was rejected. Ask Benjamin for the current TV link.":"Open this board with its private link (it ends in #k=...).";}
     else if(!LAST) showBanner('err','CONNECTING TO FEED… ('+e.message+')');
     document.body.dataset.ready='err';}
+  try{if(window.keepAwake) window.keepAwake();}catch(e){}
 }
 /* Matrix Einstein: figure never moves, poses crossfade, code rain is a tiny canvas (low fps). */
 const GM=window.GM=(function(){
@@ -361,6 +362,54 @@ const GM=window.GM=(function(){
   }
   set(forced&&TESTS[forced]?forced:'idle'); if(forced&&TESTS[forced]) box.classList.add('test');
   return {feed,set};
+})();
+
+/* Keep the TV screen on: Screen Wake Lock, with a tiny muted looping video fallback (NoSleep-style). */
+(function(){
+  let lock=null, video=null;
+  const MP4='data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAM1bW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAB9AAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAmB0cmFrAAAAXHRraGQAAAADAAAAAAAAAAAAAAABAAAAAAAAB9AAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAIAAAACAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAAfQAAAAAAABAAAAAAHYbWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAABAAAAAgABVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABg21pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAUNzdGJsAAAAw3N0c2QAAAAAAAAAAQAAALNhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAIAAgBIAAAASAAAAAAAAAABFUxhdmM2MS4xOS4xMDEgbGlieDI2NAAAAAAAAAAAAAAAGP//AAAAOWF2Y0MBZAAK/+EAG2dkAAqscgRfiIjARAAAAwAEAAADAAg8SJYRgAEAB2joQ4GUsiz9+PgAAAAAEHBhc3AAAAABAAAAAQAAABRidHJ0AAAAAAAAC0QAAAAAAAAAGHN0dHMAAAAAAAAAAQAAAAIAAEAAAAAAFHN0c3MAAAAAAAAAAQAAAAEAAAAcc3RzYwAAAAAAAAABAAAAAQAAAAIAAAABAAAAHHN0c3oAAAAAAAAAAAAAAAIAAALEAAAADQAAABRzdGNvAAAAAAAAAAEAAANlAAAAYXVkdGEAAABZbWV0YQAAAAAAAAAhaGRscgAAAAAAAAAAbWRpcmFwcGwAAAAAAAAAAAAAAAAsaWxzdAAAACSpdG9vAAAAHGRhdGEAAAABAAAAAExhdmY2MS43LjEwMwAAAAhmcmVlAAAC2W1kYXQAAAKvBgX//6vcRem95tlIt5Ys2CDZI+7veDI2NCAtIGNvcmUgMTY0IHIzMTA4IDMxZTE5ZjkgLSBILjI2NC9NUEVHLTQgQVZDIGNvZGVjIC0gQ29weWxlZnQgMjAwMy0yMDIzIC0gaHR0cDovL3d3dy52aWRlb2xhbi5vcmcveDI2NC5odG1sIC0gb3B0aW9uczogY2FiYWM9MSByZWY9MTYgZGVibG9jaz0xOjA6MCBhbmFseXNlPTB4MzoweDEzMyBtZT11bWggc3VibWU9MTAgcHN5PTEgcHN5X3JkPTEuMDA6MC4wMCBtaXhlZF9yZWY9MSBtZV9yYW5nZT0yNCBjaHJvbWFfbWU9MSB0cmVsbGlzPTIgOHg4ZGN0PTEgY3FtPTAgZGVhZHpvbmU9MjEsMTEgZmFzdF9wc2tpcD0xIGNocm9tYV9xcF9vZmZzZXQ9LTIgdGhyZWFkcz0xIGxvb2thaGVhZF90aHJlYWRzPTEgc2xpY2VkX3RocmVhZHM9MCBucj0wIGRlY2ltYXRlPTEgaW50ZXJsYWNlZD0wIGJsdXJheV9jb21wYXQ9MCBjb25zdHJhaW5lZF9pbnRyYT0wIGJmcmFtZXM9OCBiX3B5cmFtaWQ9MiBiX2FkYXB0PTIgYl9iaWFzPTAgZGlyZWN0PTMgd2VpZ2h0Yj0xIG9wZW5fZ29wPTAgd2VpZ2h0cD0yIGtleWludD0yNTAga2V5aW50X21pbj0xIHNjZW5lY3V0PTQwIGludHJhX3JlZnJlc2g9MCByY19sb29rYWhlYWQ9NjAgcmM9Y3JmIG1idHJlZT0xIGNyZj01MS4wIHFjb21wPTAuNjAgcXBtaW49MCBxcG1heD02OSBxcHN0ZXA9NCBpcF9yYXRpbz0xLjQwIGFxPTE6MS4wMACAAAAADWWIgQAC3/0Y7wKTcBkAAAAJQZoILYgr/76A';
+  function makeVideo(){
+    if(video) return video;
+    video=document.createElement('video');
+    video.setAttribute('playsinline','');
+    video.setAttribute('webkit-playsinline','');
+    video.setAttribute('muted','');
+    video.setAttribute('autoplay','');
+    video.setAttribute('loop','');
+    video.setAttribute('aria-hidden','true');
+    video.muted=true; video.defaultMuted=true; video.autoplay=true; video.loop=true;
+    video.playsInline=true; video.preload='auto';
+    video.width=1; video.height=1;
+    video.setAttribute('width','1'); video.setAttribute('height','1');
+    video.style.cssText='position:fixed;left:0;bottom:0;width:1px;height:1px;opacity:0.01;pointer-events:none;z-index:-1;border:0';
+    const s=document.createElement('source'); s.src=MP4; s.type='video/mp4';
+    video.appendChild(s);
+    document.body.appendChild(video);
+    return video;
+  }
+  function playVideo(){
+    const v=makeVideo();
+    const p=v.play();
+    if(p&&p.catch) p.catch(function(){});
+  }
+  async function acquire(){
+    if(document.hidden) return;
+    if(navigator.wakeLock&&navigator.wakeLock.request){
+      try{
+        if(lock&&lock.released===false) return;
+        lock=await navigator.wakeLock.request('screen');
+        lock.addEventListener('release',function(){ lock=null; });
+        return;
+      }catch(e){}
+    }
+    playVideo();
+  }
+  document.addEventListener('visibilitychange',function(){ if(!document.hidden) acquire(); });
+  ['click','keydown','touchstart','pointerdown'].forEach(function(ev){
+    document.addEventListener(ev, acquire, {passive:true});
+  });
+  acquire();
+  window.keepAwake=acquire;
 })();
 tick();setInterval(tick,1000);pull();setInterval(pull,10e3);
 let dk=0;const DR=[[0,0],[4,3],[-3,4],[3,-4],[-4,-3],[2,2]];setInterval(()=>{dk=(dk+1)%DR.length;$('wrap').style.transform=`translate(${DR[dk][0]}px,${DR[dk][1]}px)`},240e3);
