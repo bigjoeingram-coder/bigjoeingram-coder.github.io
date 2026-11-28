@@ -600,6 +600,7 @@ cmd.focus({preventScroll:true});
 // ---- parse ----
 const ALIAS=()=>BOARD_CONFIG.partners.map((p,i)=>({i,key:p.key,words:[p.name.toLowerCase(),p.key].concat(p.aliases||[])}));
 function parseCmd(raw){const t=raw.trim(),low=t.toLowerCase();if(!t)return{k:'none'};
+ if(/\bhang\s*up\b|\bhangup\b|\bend(\s+the)?\s+call\b|\bthrow(\s+it)?\s+back(\s+up)?\b/.test(low))return{k:'hangup'};
  if(/\bstaff\s+meeting\b/.test(low))return{k:'meeting'};
  if(/\b(end|close|stop)\s+(the\s+)?(staff\s+)?meeting\b|\bgo sell something\b|\bthat'?s all\b/.test(low))return{k:'endmeeting'};
  let best=null;ALIAS().forEach(a=>a.words.forEach(w=>{const m=new RegExp('\\b'+w.replace(/[^a-z]/g,'')+'\\b').exec(low);if(m&&(!best||m.index<best.at))best={at:m.index,i:a.i,key:a.key};}));
@@ -836,9 +837,12 @@ const _rel=window.releasePartner;window.releasePartner=function(){SPKS.t1=0;try{
 // ===== drag / spin the rock; it eases back into its tumble
 const RD=window.RD={rx:0,ry:0,vx:0,vy:0,on:false,lx:0,ly:0,lt:0};
 (function(){const c=document.getElementById('c'),pt=e=>{const r=c.getBoundingClientRect();return[(e.clientX-r.left)*1280/r.width,(e.clientY-r.top)*720/r.height];};
- c.addEventListener('pointerdown',e=>{const[x,y]=pt(e);if(window.meetP()<.05&&!window.PANEL_OPEN&&x>425&&x<855&&y>200&&y<680){RD.on=true;RD.lx=x;RD.ly=y;RD.lt=nowS();RD.vx=RD.vy=0;RD.dist=0;RD.justDragged=false;c.style.cursor='grabbing';}});
+ c.addEventListener('pointerdown',e=>{const[x,y]=pt(e);if(window.meetP()<.05&&!window.PANEL_OPEN&&x>425&&x<855&&y>200&&y<680){RD.on=true;RD.lx=x;RD.ly=y;RD.sx=x;RD.sy=y;RD.lt=nowS();RD.t0=nowS();RD.vx=RD.vy=0;RD.dist=0;RD.justDragged=false;c.style.cursor='grabbing';}});
  addEventListener('pointermove',e=>{if(!RD.on)return;const[x,y]=pt(e),dt=Math.max(.008,nowS()-RD.lt),dx=(x-RD.lx)*.012,dy=(y-RD.ly)*.012;RD.dist=(RD.dist||0)+Math.hypot(x-RD.lx,y-RD.ly);RD.ry+=dx;RD.rx+=dy;RD.vy=dx/dt;RD.vx=dy/dt;RD.lx=x;RD.ly=y;RD.lt=nowS();});
- addEventListener('pointerup',()=>{if(RD.on){RD.justDragged=(RD.dist||0)>8;RD.on=false;c.style.cursor='pointer';}});})();
+ addEventListener('pointerup',()=>{if(!RD.on)return;RD.justDragged=(RD.dist||0)>8;RD.on=false;c.style.cursor='pointer';
+  const dy=(RD.ly||RD.sy)-(RD.sy||RD.ly),dx=(RD.lx||RD.sx)-(RD.sx||RD.lx);
+  if(window.CALLOVR&&window.CALLOVR.end===null&&dy<-70&&Math.abs(dy)>Math.abs(dx)*0.85){window.releasePartner();toast('THROWN BACK TO THE OFFICE','255,64,64');}
+});})();
 // ===== Meeting: muted diamond behind whichever partner is speaking (no orbs, no halos)
 const SEATS=[[494,560,92],[640,372,104],[786,560,92]];
 function seatDiamond(){if(window.meetP()<.5||SPKS.i<0||nowS()>=SPKS.t1)return;const [x,y,r]=SEATS[SPKS.i],v=window.VAMP(window.TABS||0),c=P[SPKS.i].col,q=r*(1+.08*v);
@@ -853,17 +857,19 @@ const css2=document.createElement('style');css2.textContent='#cmdout{position:ab
 const E=CC.esc;function showOut(html){out.innerHTML=html+'<div style="margin-top:8px;text-align:right"><button id="cmdclose">Close</button></div>';out.classList.add('on');$s('cmdclose').onclick=hideOut;}
 function hideOut(){out.classList.remove('on');}addEventListener('keydown',e=>{if(e.key==='Escape')hideOut();});
 window.runCommand=function(raw){const q=raw.trim(),ql=q.toLowerCase();if(!q)return{k:'none'};hideOut();
- if(/^(help|\?)$/.test(ql)){showOut('<b>Commands</b><pre>Louis | Donna | Nigel   call that partner to center stage\nHang up | click them again | click the background | Esc   send them back\nstaff meeting            Boardroom mode (end meeting / Esc to exit)\nrefresh                  pull the feed now\nopen relay | desk | sales | kpi | biz | util | ideas | genius | proflow\ntv | ideaq | projects    open those boards\nmute | unmute            partner voice on/off\nDonna, &lt;task&gt;            draft a task for a partner or agent to copy</pre><span class="m">Messages are drafted for you to copy and post. The Command Center never posts by itself.</span>');return{k:'help'};}
+ if(/^(hang\s*up|hangup|end(\s+the)?\s+call|throw(\s+it)?\s+back(\s+up)?)$/.test(ql)){if(meetP()>.5){endMeeting();toast('MEETING ENDED','255,200,120');return{k:'hangup'};}if(window.CALLOVR&&window.CALLOVR.end===null){window.releasePartner();toast('HUNG UP','255,64,64');return{k:'hangup'};}toast('NO CALL IN PROGRESS');return{k:'hangup'};}
+ if(/^(help|\?)$/.test(ql)){showOut('<b>Commands</b><pre>Louis | Donna | Nigel   or click their office: that rock drops to center\nHang up | throw it back up | Hang Up button | Esc   send them back to the office (the rock goes invisible)\nstaff meeting            all three join the Boardroom (end meeting / hang up / Esc)\nrefresh                  pull the feed now\nopen relay | desk | sales | kpi | biz | util | ideas | genius | proflow\ntv | ideaq | projects    open those boards\nmute | unmute            partner voice on/off\nDonna, &lt;task&gt;            draft a task for a partner or agent to copy</pre><span class="m">Messages are drafted for you to copy and post. The Command Center never posts by itself.</span>');return{k:'help'};}
  if(/^(refresh|reload|update)$/.test(ql)){pull(true);toast('PULLING THE FEED\u2026');return{k:'refresh'};}
  if(ql==='mute'||ql==='unmute'){MUTED=ql==='mute';try{localStorage.setItem('cc_mute',MUTED?'1':'0')}catch(e){}toast(MUTED?'PARTNER VOICE MUTED':'PARTNER VOICE ON');return{k:ql};}
  if(ql==='tv'){const k=CC.key();window.open('../tv/'+(k?'#k='+encodeURIComponent(k):''),'_blank');return{k:'tv'};}
  if(ql==='ideaq'||ql==='projects'){window.open(LINKS[ql],'_blank');return{k:ql};}
  let m=ql.match(/^(open|show)\s+(\w+)/);if(m&&SECID[m[2]]){if(window.meetP()>.5)endMeeting();window.releasePartner();EXPID=SECID[m[2]];return{k:'open',id:EXPID};}
  const c=parseCmd(q);
+ if(c.k==='hangup'){if(meetP()>.5){endMeeting();toast('MEETING ENDED','255,200,120');return c;}if(window.CALLOVR&&window.CALLOVR.end===null){window.releasePartner();toast('HUNG UP','255,64,64');return c;}toast('NO CALL IN PROGRESS');return c;}
  if(c.k==='meeting'||c.k==='endmeeting'){if(c.k==='meeting'){window.CALLOVR=null;if(meetP()<.5)startMeeting();toast('BOARDROOM \u00b7 STAFF MEETING \u00b7 ALL THREE SEATED','255,43,214');}else{if(meetP()>.5){endMeeting();toast('MEETING ENDED','255,200,120');}else toast('NO MEETING IN PROGRESS');}return c;}
  m=q.match(/^@?([A-Za-z]+)[,:]?\s+(.+)$/);const who=m&&AGENTS().find(a=>a.toLowerCase()===m[1].toLowerCase());
  if(c.k==='partner'){const p=BOARD_CONFIG.partners[c.i];if(meetP()>.5){window.speakAs(c.i,p.name.charAt(0)+p.name.slice(1).toLowerCase()+' here.',0);toast(p.name+' HAS THE FLOOR',p.color.join(','));}
-  else{window.callPartner(c.i);toast(p.name+' \u2192 CENTER STAGE \u00b7 HANG UP OR ESC',p.color.join(','));}}
+  else{window.callPartner(c.i);toast(p.name+' \u2192 CENTER \u00b7 HANG UP, THROW IT BACK UP, OR ESC',p.color.join(','));}}
  if(who){const msg=`${who}: ${m[2].trim()}\n\u2014 Joe (from the Command Center, ${CC.time(null,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})} PT)`;window._draft=msg;
   showOut(`<b>Draft for ${E(who)}</b> <span class="m">\u00b7 not sent</span><pre>${E(msg)}</pre><button id="cpy">Copy</button><a href="${LINKS.slack}" target="_blank" rel="noopener">Open #executive-control-tower \u2197</a>`);$s('cpy').onclick=function(){navigator.clipboard.writeText(window._draft).then(()=>this.textContent='Copied \u2713');};return{k:'draft',who};}
  if(c.k==='partner')return c;
@@ -934,7 +940,7 @@ const cages=[{r:58,f:5.1,p:0,sx:.35,sy:.5,sz:.1},{r:78,f:3.3,p:2.1,sx:-.3,sy:-.4
 const ease=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
 let dfade=0,spinAcc=0,lastT=0,diaAcc=0;
 let dF=0,lastTT=0;
-const GROUP=[{x:-100,y:360-425,s:40},{x:0,y:360-448,s:46},{x:100,y:360-425,s:40}];
+window.rockVis=()=>rocks.map(r=>!!r.visible);
 window.stage3d=function(s){
  rocks.forEach(r=>r.visible=false);cageGroup.visible=false;dia.visible=false;
  const TT=window.TABS||s.T,dt=Math.max(0,Math.min(.1,TT-lastTT));lastTT=TT;const RD=window.RD||{rx:0,ry:0,vx:0,vy:0,on:false};
@@ -942,23 +948,29 @@ window.stage3d=function(s){
  if(!RD.on){RD.ry+=RD.vy*dt;RD.rx+=RD.vx*dt;const k=Math.pow(.03,dt);RD.vx*=k;RD.vy*=k;const b=Math.pow(.3,dt);RD.rx*=b;RD.ry*=b;}
  if((window.meetP&&window.meetP()>.05)||window.PANEL_OPEN){gl.render(sc,cam);return}
  const tx=0,ty=360-470,TS=106;
- rocks.forEach((r,i)=>{
-  const g=GROUP[i],called=s.act===i,e=called?s.e:0,recede=(s.act>=0&&s.act!==i)?s.e:0;
-  const x=g.x+(tx-g.x)*e,y=g.y+(ty-g.y)*e,size=(g.s+(TS-g.s)*e)*(1-.38*recede);
-  r.visible=true;
-  const v=called?s.v*dF:0,drag=called||s.act<0?1:0;
-  r.rotation.set(TT*(.28+.05*i)+v*.9+RD.rx*drag, TT*(.4+.06*i)+1.5*Math.sin(TT*2.2+i)*v+RD.ry*drag, TT*(.15+.03*i));
-  r.position.set(x,y,recede*-30);
-  r.scale.setScalar(size*(1+v*.08));
-  const p=r.geometry.attributes.position;
-  if(called){const ex=v>.25?(v-.25)*.5*(.6+.4*Math.sin(TT*21)):0;for(let f=0;f<cents.length;f++){const n=nrm[f];for(let k=0;k<3;k++)for(let a=0;a<3;a++)p.array[f*9+k*3+a]=bp[f*9+k*3+a]+n[a]*ex*(0.6+0.8*((f*37)%7)/7);}p.needsUpdate=true;r.geometry.computeVertexNormals();}
-  else if(p.array[0]!==bp[0]||p.array[1]!==bp[1]){p.array.set(bp);p.needsUpdate=true;r.geometry.computeVertexNormals();}
-  const m=r.material;m.emissiveIntensity=i==1?(.02+.08*v):(.06+.25*v);if(i==1)m.emissive.setHex(0x1a3a80);
- });
- const fi=s.act>=0?s.act:1,vv=s.act>=0?s.v*dF:0;
- if(s.act<0){rim1.color.setHex(0xcfe4ff);rim2.color.setHex(0xcfe4ff);rim1.intensity=3.2;rim2.intensity=2.4;}
- else{rim1.color.setHex(RIM[fi]);rim2.color.setHex(RIM[fi]);rim1.intensity=(fi==1?3.6:1.6)+(fi==1?4:3)*vv;rim2.intensity=(fi==1?2.8:1.0)+(fi==1?3:2.5)*vv;}
- if(dF>.01&&s.e>.9&&s.act>=0){dia.visible=true;const c=DIA[s.act];dEdge.material.color.setHex(c);dFace.material.color.setHex(c);dEdge2.material.color.setHex(c);
+ const i=s.act;
+ if(s.act<0){rim1.color.setHex(0xcfe4ff);rim2.color.setHex(0xcfe4ff);rim1.intensity=3.2;rim2.intensity=2.4;gl.render(sc,cam);return}
+ let e=s.e||0;
+ if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+  e=(window.CALLOVR&&window.CALLOVR.end!==null)?0:1;
+ }
+ // Office-resting rocks stay invisible. Only the partner on a call appears, dropping from the office tile.
+ if(e<.02){rim1.color.setHex(0xcfe4ff);rim2.color.setHex(0xcfe4ff);rim1.intensity=3.2;rim2.intensity=2.4;gl.render(sc,cam);return}
+ const r=rocks[i];
+ const sx=(typeof s.slotX==='number'?s.slotX:1280*(P[i]?P[i].x:.5))-640,sy=360-120;
+ const x=sx+(tx-sx)*e,y=sy+(ty-sy)*e,size=18+(TS-18)*e;
+ r.visible=true;
+ const v=s.v*dF;
+ r.rotation.set(TT*(.28+.05*i)+v*.9+RD.rx, TT*(.4+.06*i)+1.5*Math.sin(TT*2.2+i)*v+RD.ry, TT*(.15+.03*i));
+ r.position.set(x,y,0);
+ r.scale.setScalar(size*(1+v*.08));
+ const p=r.geometry.attributes.position;
+ if(v>.02){const ex=v>.25?(v-.25)*.5*(.6+.4*Math.sin(TT*21)):0;for(let f=0;f<cents.length;f++){const n=nrm[f];for(let k=0;k<3;k++)for(let a=0;a<3;a++)p.array[f*9+k*3+a]=bp[f*9+k*3+a]+n[a]*ex*(0.6+0.8*((f*37)%7)/7);}p.needsUpdate=true;r.geometry.computeVertexNormals();}
+ else if(p.array[0]!==bp[0]||p.array[1]!==bp[1]){p.array.set(bp);p.needsUpdate=true;r.geometry.computeVertexNormals();}
+ const m=r.material;m.emissiveIntensity=i==1?(.02+.08*v):(.06+.25*v);if(i==1)m.emissive.setHex(0x1a3a80);
+ const vv=s.v*dF;
+ rim1.color.setHex(RIM[i]);rim2.color.setHex(RIM[i]);rim1.intensity=(i==1?3.6:1.6)+(i==1?4:3)*vv;rim2.intensity=(i==1?2.8:1.0)+(i==1?3:2.5)*vv;
+ if(dF>.01&&e>.9){dia.visible=true;const c=DIA[i];dEdge.material.color.setHex(c);dFace.material.color.setHex(c);dEdge2.material.color.setHex(c);
   dEdge.material.opacity=dF*(.32+.25*s.v);dFace.material.opacity=dF*(.035+.04*s.v);dEdge2.material.opacity=dF*(.18+.2*s.v);
   dia.position.set(0,ty,-200);dia.scale.setScalar(150*(1+.1*s.v));dia.rotation.set(0,TT*.25+s.v*.35,0);}
  gl.render(sc,cam);}
