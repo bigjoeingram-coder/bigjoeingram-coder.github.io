@@ -8,7 +8,7 @@
 <script>
 const M=n=>(window.CC_MEDIA||{})[n]||'';
 const S=location.search.includes('lo')?1:2;const TAU=Math.PI*2,cv=document.getElementById('c'),ctx=cv.getContext('2d');cv.width=1280*S;cv.height=720*S;function fit(){const s=Math.min(innerWidth/1280,innerHeight/720);for(const e of document.querySelectorAll('canvas')){e.style.width='1280px';e.style.height='720px';e.style.transformOrigin='0 0';e.style.transform='translate('+(innerWidth-1280*s)/2+'px,'+(innerHeight-720*s)/2+'px) scale('+s+')';}}addEventListener('resize',fit);setTimeout(fit,0);
-const P=[{n:'DONNA',role:'CHIEF OF STAFF',col:[255,42,200],x:.22,brain:'TBD',img:'donna',st:'Drafting follow-ups'},{n:'LOUIS',role:'OPERATIONS',col:[0,110,255],x:.5,brain:'TBD',img:'louis',st:'Reviewing build'},{n:'NIGEL',role:'EFFICIENCY',col:[255,122,26],x:.78,brain:'Grok Bot',img:'nigel',st:'Logging the Relay'}];
+const P=[{n:'DONNA',role:'CHIEF OF STAFF',col:[255,42,200],x:.397,brain:'TBD',img:'donna',st:'Drafting follow-ups'},{n:'LOUIS',role:'OPERATIONS',col:[0,110,255],x:.5,brain:'TBD',img:'louis',st:'Reviewing build'},{n:'NIGEL',role:'EFFICIENCY',col:[255,122,26],x:.603,brain:'Grok Bot',img:'nigel',st:'Logging the Relay'}];
 const CYC=38.4,IDLE=.6,DOWN=.6,SPK=3.4,UP=.6,SLOT=DOWN+SPK+UP;
 let ORDER=[1,2,0];
 function hash(n){const s=Math.sin(n*127.1)*43758.5453;return s-Math.floor(s)}
@@ -117,7 +117,7 @@ function frame(T){ctx.setTransform(S,0,0,S,0,0);window.TABS=T;
  // frame brackets
  ctx.strokeStyle='rgba(0,70,222,.7)';ctx.lineWidth=2;[[20,20,1,1],[W-20,20,-1,1],[20,H-20,1,-1],[W-20,H-20,-1,-1]].forEach(([x,y,a,b])=>{ctx.beginPath();ctx.moveTo(x,y+30*b);ctx.lineTo(x,y);ctx.lineTo(x+30*a,y);ctx.stroke()});
  ctx.font='600 12px "IBM Plex Mono",monospace';ctx.fillStyle='rgba(120,160,255,.8)';ctx.textAlign='left';
- ctx.font='600 11px "IBM Plex Mono",monospace';ctx.fillText('COMMAND CENTER'+((window.meetP&&window.meetP()>.5)?' · BOARDROOM':''),40,44);ctx.textAlign='right';ctx.fillText(window.HDR_RIGHT||'',W-40,44);if(window.HDR_FEED){ctx.font='600 9px "IBM Plex Mono",monospace';ctx.fillStyle='rgb('+window.HDR_FEEDC+')';ctx.fillText(window.HDR_FEED,W-24,197);}
+ ctx.font='600 11px "IBM Plex Mono",monospace';ctx.fillText('COMMAND CENTER'+((window.meetP&&window.meetP()>.5)?' · BOARDROOM':''),40,44);ctx.textAlign='right';ctx.fillText(window.HDR_RIGHT||'',W-40,44);if(window.HDR_FEED){ctx.font='600 9px "IBM Plex Mono",monospace';ctx.fillStyle='rgb('+window.HDR_FEEDC+')';ctx.fillText(window.HDR_FEED,W-24,58);}
  // stage ring-less frame: hex-free rectangular stage
  const stage={x:W/2,y:450,R:150};
  ctx.strokeStyle='rgba(0,70,222,.3)';ctx.lineWidth=1;ctx.strokeRect(W/2-215,205,430,490);
@@ -128,9 +128,9 @@ function frame(T){ctx.setTransform(S,0,0,S,0,0);window.TABS=T;
 const ov=window.CALLOVR;if(ov){const r=window.TABS-ov.t0;if(ov.end===null){act=ov.i;ph=r<DOWN?r:Math.min(r,DOWN+SPK-.02);}else{const q=window.TABS-ov.end;if(q>UP+.02)window.CALLOVR=null;else{act=ov.i;ph=DOWN+SPK+q;}}}
  let pos=0;if(act>=0){if(ph<DOWN)pos=ease(ph/DOWN),mode='CALLED';else if(ph<DOWN+SPK)pos=1,mode=(window.SPEAKNOW&&window.SPEAKNOW(act,ph))?'SPEAKING':'ON STAGE';else pos=1-ease((ph-DOWN-SPK)/UP),mode='RETURNING';}
  const slotY=84,slotR=48;
- P.forEach((p,i)=>{const sx=W*p.x;ctx.strokeStyle='rgba(0,70,222,.45)';ctx.lineWidth=1;ctx.strokeRect(sx-62,30,124,160);
+ P.forEach((p,i)=>{const sx=W*p.x;ctx.strokeStyle='rgba(0,70,222,.45)';ctx.lineWidth=1;ctx.strokeRect(sx-62,30,124,148);
   ctx.fillStyle=`rgb(${p.col})`;ctx.font='700 14px Archivo,sans-serif';ctx.textAlign='center';ctx.fillText(p.n,sx,160);
-  ctx.font='400 10px "IBM Plex Mono",monospace';ctx.fillStyle='rgba(150,180,255,.75)';ctx.fillText(p.role,sx,172);ctx.fillStyle='rgba(255,255,255,.55)';ctx.fillText('brain: '+p.brain,sx,183);});
+  ctx.font='400 10px "IBM Plex Mono",monospace';ctx.fillStyle='rgba(150,180,255,.75)';ctx.fillText(p.role,sx,172);});
  window.CUR={act,ph};
  P.forEach((p,i)=>{const sx=W*p.x;const isA=i===act&&window.SPEAKNOW&&window.SPEAKNOW(act,ph)&&ph<DOWN+SPK;const v=isA?window.VAMP(T):0;
   drawTile(sx,slotY,104,88,i,T,v,false,0,isA);
@@ -242,7 +242,7 @@ function drawTile(cx,cy,w,h,i,t,v,active0,e,active){
  ctx.strokeStyle=`rgba(${col},${active?.6+.4*v:.75})`;ctx.lineWidth=active?2.5:1.5;ctx.shadowColor=`rgb(${col})`;ctx.shadowBlur=active?10+30*v:6;ctx.strokeRect(x,y,w,h);ctx.shadowBlur=0;if(t>=RAVE.t0&&t<RAVE.t1){const bb=(((t-RAVE.t0)*4+i*.33)%1),dd=Math.exp(-bb*9);ctx.lineWidth=2+5*dd;ctx.strokeStyle=`rgba(${col},${.5+.5*dd})`;ctx.shadowColor=`rgb(${col})`;ctx.shadowBlur=30*dd;ctx.strokeRect(x-2-3*dd,y-2-3*dd,w+4+6*dd,h+4+6*dd);ctx.shadowBlur=0}
  const dots='.'.repeat(1+Math.floor(t*3)%3);ctx.font='600 12px "IBM Plex Mono",monospace';ctx.textAlign='center';ctx.fillStyle=`rgb(${col})`;
  const rv=t>=RAVE.t0&&t<RAVE.t1;const tsk=false&&!active&&st.p<.1&&(()=>{const o=offSeg(i,window.TABS);return o&&o.a==='task_sign'&&window.TABS-o.t0>2.7})();const txt=tsk?'Working on task'+dots:rv?'\u266a RAVE MODE \u266a':st.p>.1?(st.k==='brb'?'Right back'+dots:st.k==='meet'?'In a meeting'+dots:'Do not disturb'):active&&!call.p?'Speaking'+dots:(call.p>.1?'On call'+(call.pair?' \u00b7 '+P[call.other].n:'')+dots:p.st);
- ctx.fillText(txt,cx,y+h+16);
+ ctx.fillText(fitW(txt,e>.05?12:10,w-8),cx,y+h+16);
 }
 // ===== BOARD_CONFIG: everything customer-specific lives here (a new customer's board = a new config). No keys/secrets, ever. =====
 const BOARD_CONFIG={
@@ -285,8 +285,8 @@ const DEMO=false;window.DEMO=DEMO;
 // ---- LAYOUT REGISTRY: add a section = add one line here + a summary/details case ----
 const LAYOUT=BOARD_CONFIG.sections.map(s=>[s.id,s.col,s.weight]);
 const SM={};
-(function(){const y0=205,tot=495,gap=12,X={L:24,R:866};['L','R'].forEach(c=>{const L=LAYOUT.filter(l=>l[1]===c),sum=L.reduce((a,l)=>a+l[2],0),u=(tot-gap*(L.length-1))/sum;let y=y0;L.forEach(l=>{SM[l[0]]={x:X[c],y,w:390,h:Math.round(u*l[2])};y+=Math.round(u*l[2])+gap;});});})();
-P.forEach(p=>{SM[p.img]={x:1280*p.x-62,y:30,w:124,h:160}});
+(function(){const gap=10,COL={L:{x:16,y:206,w:400,h:474},R:{x:864,y:72,w:400,h:608}};['L','R'].forEach(c=>{const C=COL[c],L=LAYOUT.filter(l=>l[1]===c),sum=L.reduce((a,l)=>a+l[2],0),u=(C.h-gap*(L.length-1))/sum;let y=C.y;L.forEach(l=>{SM[l[0]]={x:C.x,y,w:C.w,h:Math.round(u*l[2])};y+=Math.round(u*l[2])+gap;});});})();
+P.forEach(p=>{SM[p.img]={x:1280*p.x-62,y:30,w:124,h:148}});
 const BIG={x:240,y:205,w:800,h:480};
 const PCOL={};BOARD_CONFIG.sections.forEach(s=>{PCOL[s.id]=s.color});
 const PTITLE={};BOARD_CONFIG.sections.forEach(s=>{PTITLE[s.id]=s.title});
@@ -480,10 +480,10 @@ function drawDoc(x,y,w,h,d,by,a){ctx.save();ctx.globalAlpha=a;ctx.fillStyle='rgb
  tx(d.owner+' \u00b7 '+d.date,x+6,y+h*.46,Math.max(7,h*.07),'rgba(150,180,255,.9)');
  if(d.thumb){const k=Math.min((w-12)/d.thumb.width,h*.4/d.thumb.height);ctx.drawImage(d.thumb,x+6,y+h*.54,d.thumb.width*k,d.thumb.height*k);}else d.lines.slice(0,4).forEach((l,i)=>tx(l.slice(0,36),x+6,y+h*.62+i*h*.12,Math.max(7,h*.075),'rgba(220,230,255,.95)'));
  tx(d.up?'UPLOADED':'FROM THE LIVE FEED',x+w-6,y+h-5,Math.max(6,h*.06),'rgba(255,255,255,.4)','right');ctx.restore();}
-const BTN={m:{x:1096,y:70,w:160,h:26},d:{x:1096,y:104,w:160,h:24},x:{x:1096,y:136,w:160,h:24}};
+const BTN={m:{x:560,y:180,w:160,h:22},d:{x:568,y:180,w:150,h:22},x:{x:726,y:180,w:124,h:22}};function meetMbtn(){return window.meetP()>.5?{x:430,y:180,w:130,h:22}:BTN.m;}
 function btn(b,label,on,flash){ctx.fillStyle=on?'rgba(255,31,206,.28)':'rgba(2,10,30,.9)';ctx.fillRect(b.x,b.y,b.w,b.h);ctx.strokeStyle=on?'rgb(255,31,206)':'rgba(0,110,255,.8)';ctx.lineWidth=flash?3:1;ctx.strokeRect(b.x,b.y,b.w,b.h);ctx.lineWidth=1;tx(label,b.x+b.w/2,b.y+b.h*.68,10,on?'#fff':'rgb(150,180,255)','center',600);}
 function drawMeetBtns(Tt,mp,st){const on=mp>.5;
- btn(BTN.m,on?'END MEETING [Esc]':'STAFF MEETING [M]',on,MEETDEMO&&(Tt>=.5&&Tt<.85||Tt>=24.5&&Tt<24.85));
+ btn(meetMbtn(),on?'END MEETING [Esc]':'STAFF MEETING [M]',on,MEETDEMO&&(Tt>=.5&&Tt<.85||Tt>=24.5&&Tt<24.85));
  if(on){btn(BTN.d,'CAPTURE DECISION [D]',false,false);btn(BTN.x,'DISMISS DOC [X]',false,MEETDEMO&&Tt>=12.5&&Tt<12.85);}}
 function chair(cx,by,w,h,k){ctx.fillStyle='#080d1a';ctx.beginPath();ctx.moveTo(cx-w/2,by);ctx.lineTo(cx-w/2+k,by-h);ctx.lineTo(cx+w/2+k,by-h);ctx.lineTo(cx+w/2,by);ctx.closePath();ctx.fill();ctx.fillStyle='#0b1226';ctx.fillRect(cx-w/2+8+k*.5,by-h*.92,w-16,6);}
 function shadow(cx,y,w,sk){ctx.fillStyle='rgba(0,0,0,.38)';ctx.beginPath();ctx.moveTo(cx-w/2,y);ctx.lineTo(cx+w/2,y);ctx.lineTo(cx+w/2+sk,y+16);ctx.lineTo(cx-w/2+sk,y+16);ctx.closePath();ctx.fill();}
@@ -543,7 +543,7 @@ const inTable=(x,y)=>x>=440&&x<=840&&y>=430&&y<=672;
 if(!MEETDEMO&&!DEMO){const cv2=document.getElementById('c');
  const pt=e=>{const r=cv2.getBoundingClientRect();return[(e.clientX-r.left)*1280/r.width,(e.clientY-r.top)*720/r.height];};
  cv2.addEventListener('mousedown',e=>{const[x,y]=pt(e);
-  if(inR(BTN.m,x,y)){meetP()>.5?endMeeting():startMeeting();return;}
+  if(inR(meetMbtn(),x,y)){meetP()>.5?endMeeting():startMeeting();return;}
   if(meetP()>.5&&inR(BTN.d,x,y)){meetingDecision();return;}
   if(meetP()>.5&&inR(BTN.x,y>0?x:0,y)){dismissDoc();return;}
   if(meetP()>.5)for(const id in MDOCS){const a=SM[id];if(a&&inR(a,x,y)){DRAG.on=true;DRAG.id=id;DRAG.x=x;DRAG.y=y;return;}}});
@@ -571,9 +571,14 @@ window.panelsDraw=function(Tabs,act){
 if(!DEMO){const cv=document.getElementById('c');cv.style.cursor='pointer';
  const hit=(e)=>{const r=cv.getBoundingClientRect();return[(e.clientX-r.left)*1280/r.width,(e.clientY-r.top)*720/r.height];};
  cv.addEventListener('click',e=>{const[x,y]=hit(e);if(window.meetP()>.05)return;if(EXPID){EXPID=null;return;}
-  {const pi=P.findIndex(p=>{const a=SM[p.img];return x>=a.x&&x<=a.x+a.w&&y>=a.y&&y<=a.y+a.h});if(pi>=0){window.callPartner(pi);return;}}
-  if(window.CUR&&window.CUR.act>=0)return;
-  for(const id in SM){const a=SM[id];if(x>=a.x&&x<=a.x+a.w&&y>=a.y&&y<=a.y+a.h){EXPID=id;return;}}});
+  if(window.RD&&window.RD.justDragged){window.RD.justDragged=false;return;}
+  if(typeof meetMbtn==='function'&&inR(meetMbtn(),x,y))return;
+  const onCall=window.CALLOVR&&window.CALLOVR.end===null;
+  const pi=P.findIndex(p=>{const a=SM[p.img];return x>=a.x&&x<=a.x+a.w&&y>=a.y&&y<=a.y+a.h});
+  if(pi>=0){if(onCall&&window.CALLOVR.i===pi){window.releasePartner();return;}window.callPartner(pi);return;}
+  if(onCall&&window.HANGUP&&x>=window.HANGUP.x&&x<=window.HANGUP.x+window.HANGUP.w&&y>=window.HANGUP.y&&y<=window.HANGUP.y+window.HANGUP.h){window.releasePartner();return;}
+  for(const id in SM){if(P.some(p=>p.img===id))continue;const a=SM[id];if(x>=a.x&&x<=a.x+a.w&&y>=a.y&&y<=a.y+a.h){if(onCall)window.releasePartner();EXPID=id;return;}}
+  if(onCall){window.releasePartner();return;}});
  addEventListener('keydown',e=>{if(e.key==='Escape')EXPID=null;});}
 
 // ===== COMMAND BAR (v8): real text input at bottom center. Joe's talk-to-type app just types into it. =====
@@ -783,7 +788,7 @@ function buildDocs(){for(const k in MDOCS)delete MDOCS[k];const day=ptDay(),add=
  const g=geniusSnap();add('genius','Hey Genius','GENIUS',g?(g.data.dispatches||[]).slice(0,4).map(x=>(x.seat||'Benjamin')+': '+x.text):[]);
  add('proflow','ProFlow activity','PROFLOW',['NO FEED \u00b7 not connected yet']);}
 function partnerStatus(){BOARD_CONFIG.partners.forEach((c,i)=>{const r=D&&D.agents.data?D.roster.find(x=>(x.name||'').toLowerCase()===c.key):null;
-  P[i].st=!D||!D.agents.data?'status: NO FEED':!r?'status: not tracked':r.state==='working'?fitW('Working: '+(r.doing||''),12,250):r.state==='idle'?'Idle \u00b7 seen '+CC.ago(r.last_at):'Quiet \u00b7 last seen '+(r.last_at?CC.ago(r.last_at):'never');});}
+  P[i].st=!D||!D.agents.data?'NO FEED':!r?'not tracked':r.state==='working'?fitW('Working: '+(r.doing||''),12,118):r.state==='idle'?fitW('Idle · '+(r.last_at?CC.ago(r.last_at):''),12,118):fitW('Quiet · '+(r.last_at?CC.ago(r.last_at):'never'),12,118);});}
 function renderLive(){D=CC.derive(F);
  Object.assign(LT,{util:D.agents,desk:D.needs,relay:D.relay,biz:D.biz,
   sales:{state:F.sales?'live':'nofeed',source:'cc.sales ledger (deduped by payment ID)',updated_at:F.generated_at},
@@ -831,9 +836,9 @@ const _rel=window.releasePartner;window.releasePartner=function(){SPKS.t1=0;try{
 // ===== drag / spin the rock; it eases back into its tumble
 const RD=window.RD={rx:0,ry:0,vx:0,vy:0,on:false,lx:0,ly:0,lt:0};
 (function(){const c=document.getElementById('c'),pt=e=>{const r=c.getBoundingClientRect();return[(e.clientX-r.left)*1280/r.width,(e.clientY-r.top)*720/r.height];};
- c.addEventListener('pointerdown',e=>{const[x,y]=pt(e);if(window.meetP()<.05&&window.CUR&&window.CUR.act>=0&&x>425&&x<855&&y>205&&y<680){RD.on=true;RD.lx=x;RD.ly=y;RD.lt=nowS();RD.vx=RD.vy=0;c.style.cursor='grabbing';}});
- addEventListener('pointermove',e=>{if(!RD.on)return;const[x,y]=pt(e),dt=Math.max(.008,nowS()-RD.lt),dx=(x-RD.lx)*.012,dy=(y-RD.ly)*.012;RD.ry+=dx;RD.rx+=dy;RD.vy=dx/dt;RD.vx=dy/dt;RD.lx=x;RD.ly=y;RD.lt=nowS();});
- addEventListener('pointerup',()=>{if(RD.on){RD.on=false;c.style.cursor='pointer';}});})();
+ c.addEventListener('pointerdown',e=>{const[x,y]=pt(e);if(window.meetP()<.05&&!window.PANEL_OPEN&&x>425&&x<855&&y>200&&y<680){RD.on=true;RD.lx=x;RD.ly=y;RD.lt=nowS();RD.vx=RD.vy=0;RD.dist=0;RD.justDragged=false;c.style.cursor='grabbing';}});
+ addEventListener('pointermove',e=>{if(!RD.on)return;const[x,y]=pt(e),dt=Math.max(.008,nowS()-RD.lt),dx=(x-RD.lx)*.012,dy=(y-RD.ly)*.012;RD.dist=(RD.dist||0)+Math.hypot(x-RD.lx,y-RD.ly);RD.ry+=dx;RD.rx+=dy;RD.vy=dx/dt;RD.vx=dy/dt;RD.lx=x;RD.ly=y;RD.lt=nowS();});
+ addEventListener('pointerup',()=>{if(RD.on){RD.justDragged=(RD.dist||0)>8;RD.on=false;c.style.cursor='pointer';}});})();
 // ===== Meeting: muted diamond behind whichever partner is speaking (no orbs, no halos)
 const SEATS=[[494,560,92],[640,372,104],[786,560,92]];
 function seatDiamond(){if(window.meetP()<.5||SPKS.i<0||nowS()>=SPKS.t1)return;const [x,y,r]=SEATS[SPKS.i],v=window.VAMP(window.TABS||0),c=P[SPKS.i].col,q=r*(1+.08*v);
@@ -848,7 +853,7 @@ const css2=document.createElement('style');css2.textContent='#cmdout{position:ab
 const E=CC.esc;function showOut(html){out.innerHTML=html+'<div style="margin-top:8px;text-align:right"><button id="cmdclose">Close</button></div>';out.classList.add('on');$s('cmdclose').onclick=hideOut;}
 function hideOut(){out.classList.remove('on');}addEventListener('keydown',e=>{if(e.key==='Escape')hideOut();});
 window.runCommand=function(raw){const q=raw.trim(),ql=q.toLowerCase();if(!q)return{k:'none'};hideOut();
- if(/^(help|\?)$/.test(ql)){showOut('<b>Commands</b><pre>Louis | Donna | Nigel   call that partner to center stage (Esc releases)\nstaff meeting            Boardroom mode (end meeting / Esc to exit)\nrefresh                  pull the feed now\nopen relay | desk | sales | kpi | biz | util | ideas | genius | proflow\ntv | ideaq | projects    open those boards\nmute | unmute            partner voice on/off\nDonna, &lt;task&gt;            draft a task for a partner or agent to copy</pre><span class="m">Messages are drafted for you to copy and post. The Command Center never posts by itself.</span>');return{k:'help'};}
+ if(/^(help|\?)$/.test(ql)){showOut('<b>Commands</b><pre>Louis | Donna | Nigel   call that partner to center stage\nHang up | click them again | click the background | Esc   send them back\nstaff meeting            Boardroom mode (end meeting / Esc to exit)\nrefresh                  pull the feed now\nopen relay | desk | sales | kpi | biz | util | ideas | genius | proflow\ntv | ideaq | projects    open those boards\nmute | unmute            partner voice on/off\nDonna, &lt;task&gt;            draft a task for a partner or agent to copy</pre><span class="m">Messages are drafted for you to copy and post. The Command Center never posts by itself.</span>');return{k:'help'};}
  if(/^(refresh|reload|update)$/.test(ql)){pull(true);toast('PULLING THE FEED\u2026');return{k:'refresh'};}
  if(ql==='mute'||ql==='unmute'){MUTED=ql==='mute';try{localStorage.setItem('cc_mute',MUTED?'1':'0')}catch(e){}toast(MUTED?'PARTNER VOICE MUTED':'PARTNER VOICE ON');return{k:ql};}
  if(ql==='tv'){const k=CC.key();window.open('../tv/'+(k?'#k='+encodeURIComponent(k):''),'_blank');return{k:'tv'};}
@@ -858,7 +863,7 @@ window.runCommand=function(raw){const q=raw.trim(),ql=q.toLowerCase();if(!q)retu
  if(c.k==='meeting'||c.k==='endmeeting'){if(c.k==='meeting'){window.CALLOVR=null;if(meetP()<.5)startMeeting();toast('BOARDROOM \u00b7 STAFF MEETING \u00b7 ALL THREE SEATED','255,43,214');}else{if(meetP()>.5){endMeeting();toast('MEETING ENDED','255,200,120');}else toast('NO MEETING IN PROGRESS');}return c;}
  m=q.match(/^@?([A-Za-z]+)[,:]?\s+(.+)$/);const who=m&&AGENTS().find(a=>a.toLowerCase()===m[1].toLowerCase());
  if(c.k==='partner'){const p=BOARD_CONFIG.partners[c.i];if(meetP()>.5){window.speakAs(c.i,p.name.charAt(0)+p.name.slice(1).toLowerCase()+' here.',0);toast(p.name+' HAS THE FLOOR',p.color.join(','));}
-  else{window.callPartner(c.i);toast(p.name+' \u2192 CENTER STAGE [Esc to release]',p.color.join(','));}}
+  else{window.callPartner(c.i);toast(p.name+' \u2192 CENTER STAGE \u00b7 HANG UP OR ESC',p.color.join(','));}}
  if(who){const msg=`${who}: ${m[2].trim()}\n\u2014 Joe (from the Command Center, ${CC.time(null,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})} PT)`;window._draft=msg;
   showOut(`<b>Draft for ${E(who)}</b> <span class="m">\u00b7 not sent</span><pre>${E(msg)}</pre><button id="cpy">Copy</button><a href="${LINKS.slack}" target="_blank" rel="noopener">Open #executive-control-tower \u2197</a>`);$s('cpy').onclick=function(){navigator.clipboard.writeText(window._draft).then(()=>this.textContent='Copied \u2713');};return{k:'draft',who};}
  if(c.k==='partner')return c;
@@ -866,6 +871,25 @@ window.runCommand=function(raw){const q=raw.trim(),ql=q.toLowerCase();if(!q)retu
 // setup overlay (no key / bad key)
 (function(){const d=document.createElement('div');d.id='setup';d.innerHTML='<div style="font:700 34px Archivo,sans-serif;letter-spacing:3px;color:#fff">INGRAM COMMAND</div><div id="setupmsg">Open the Command Center with its private link (it ends in #k=\u2026).</div>';document.body.appendChild(d);})();
 hdr();pull(false);setInterval(()=>pull(false),60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&LASTOK&&Date.now()-LASTOK>60000)pull(false);});
+
+// ===== Hang up: red button, second click on the rock, empty background, Esc (even when the command bar is focused)
+window.HANGUP={x:555,y:598,w:170,h:30};
+(function(){
+  const hang=document.createElement('button');hang.id='hangup';hang.type='button';hang.textContent='HANG UP';
+  hang.style.cssText='position:absolute;left:555px;top:598px;width:170px;height:30px;box-sizing:border-box;background:#c41028;color:#fff;border:1px solid #ff5a6a;font:700 13px "IBM Plex Mono",monospace;letter-spacing:1.5px;cursor:pointer;pointer-events:auto;display:none;z-index:6';
+  const uiEl=document.getElementById('ui');if(uiEl)uiEl.appendChild(hang);else document.body.appendChild(hang);
+  const st=document.createElement('style');st.textContent='#hangup:hover{background:#e31b33;box-shadow:0 0 14px rgba(255,59,78,.55)}';document.head.appendChild(st);
+  function hangVisible(){return !!(!(window.meetP&&window.meetP()>.05)&&window.CALLOVR&&window.CALLOVR.end===null&&window.CUR&&window.CUR.act>=0&&window.CUR.ph>=DOWN);}
+  function syncHang(){hang.style.display=hangVisible()?'block':'none';}
+  setInterval(syncHang,80);
+  hang.addEventListener('pointerdown',e=>{e.stopPropagation();});
+  hang.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();if(hangVisible()||(window.CALLOVR&&window.CALLOVR.end===null)){window.releasePartner();toast('HUNG UP','255,64,64');try{document.getElementById('cmd').focus({preventScroll:true})}catch(err){}}});
+  addEventListener('keydown',e=>{
+    if(e.key!=='Escape')return;
+    if(window.meetP&&window.meetP()>.5)return;
+    if(window.CALLOVR&&window.CALLOVR.end===null){window.releasePartner();try{document.getElementById('cmd').value='';document.getElementById('cmd').focus({preventScroll:true})}catch(err){}toast('HUNG UP','255,64,64');}
+  },true);
+})();
 
 window.frame=frame;
 if(!location.search.includes('manual')){const t0=performance.now();let lastF=0;(function L(ts){requestAnimationFrame(L);if(document.hidden||ts-lastF<40)return;lastF=ts;frame((performance.now()-t0)/1000)})();document.addEventListener('visibilitychange',()=>{for(const k in VID){if(document.hidden)VID[k].pause();else VID[k].play().catch(()=>{})}})}
@@ -910,26 +934,33 @@ const cages=[{r:58,f:5.1,p:0,sx:.35,sy:.5,sz:.1},{r:78,f:3.3,p:2.1,sx:-.3,sy:-.4
 const ease=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2;
 let dfade=0,spinAcc=0,lastT=0,diaAcc=0;
 let dF=0,lastTT=0;
+const GROUP=[{x:-100,y:360-425,s:40},{x:0,y:360-448,s:46},{x:100,y:360-425,s:40}];
 window.stage3d=function(s){
- rocks.forEach(r=>r.visible=false);cageGroup.visible=false;
+ rocks.forEach(r=>r.visible=false);cageGroup.visible=false;dia.visible=false;
  const TT=window.TABS||s.T,dt=Math.max(0,Math.min(.1,TT-lastTT));lastTT=TT;const RD=window.RD||{rx:0,ry:0,vx:0,vy:0,on:false};
  dF+=((s.speaking?1:0)-dF)*Math.min(1,dt*6);
  if(!RD.on){RD.ry+=RD.vy*dt;RD.rx+=RD.vx*dt;const k=Math.pow(.03,dt);RD.vx*=k;RD.vy*=k;const b=Math.pow(.3,dt);RD.rx*=b;RD.ry*=b;}
- if(s.act<0){dia.visible=false;gl.render(sc,cam);return}
- const i=s.act,r=rocks[i],v=s.v*dF;r.visible=true;
- const tx=0,ty=360-470,sx=s.slotX-640,sy=360-120;const e=s.e;const x=sx+(tx-sx)*e,y=sy+(ty-sy)*e;
- const size=18+88*e;
- r.rotation.set(TT*.33+v*.9+RD.rx, TT*.45+1.5*Math.sin(TT*2.2)*v+RD.ry, TT*.18);
- r.position.set(x,y,0);r.scale.setScalar(size*(1+v*.08));
- const ex=v>.25?(v-.25)*.5*(.6+.4*Math.sin(TT*21)):0;
- const p=r.geometry.attributes.position;for(let f=0;f<cents.length;f++){const n=nrm[f];for(let k=0;k<3;k++)for(let a=0;a<3;a++)p.array[f*9+k*3+a]=bp[f*9+k*3+a]+n[a]*ex*(0.6+0.8*((f*37)%7)/7);}
- p.needsUpdate=true;r.geometry.computeVertexNormals();
- const m=r.material;m.emissiveIntensity=i==1?.02+.08*v:.06+.25*v;if(i==1)m.emissive.setHex(0x1a3a80);
- rim1.color.setHex(RIM[i]);rim2.color.setHex(RIM[i]);rim1.intensity=(i==1?3.6:1.6)+(i==1?4:3)*v;rim2.intensity=(i==1?2.8:1.0)+(i==1?3:2.5)*v;
- if(dF>.01&&e>.9){dia.visible=true;const c=DIA[i];dEdge.material.color.setHex(c);dFace.material.color.setHex(c);dEdge2.material.color.setHex(c);
+ if((window.meetP&&window.meetP()>.05)||window.PANEL_OPEN){gl.render(sc,cam);return}
+ const tx=0,ty=360-470,TS=106;
+ rocks.forEach((r,i)=>{
+  const g=GROUP[i],called=s.act===i,e=called?s.e:0,recede=(s.act>=0&&s.act!==i)?s.e:0;
+  const x=g.x+(tx-g.x)*e,y=g.y+(ty-g.y)*e,size=(g.s+(TS-g.s)*e)*(1-.38*recede);
+  r.visible=true;
+  const v=called?s.v*dF:0,drag=called||s.act<0?1:0;
+  r.rotation.set(TT*(.28+.05*i)+v*.9+RD.rx*drag, TT*(.4+.06*i)+1.5*Math.sin(TT*2.2+i)*v+RD.ry*drag, TT*(.15+.03*i));
+  r.position.set(x,y,recede*-30);
+  r.scale.setScalar(size*(1+v*.08));
+  const p=r.geometry.attributes.position;
+  if(called){const ex=v>.25?(v-.25)*.5*(.6+.4*Math.sin(TT*21)):0;for(let f=0;f<cents.length;f++){const n=nrm[f];for(let k=0;k<3;k++)for(let a=0;a<3;a++)p.array[f*9+k*3+a]=bp[f*9+k*3+a]+n[a]*ex*(0.6+0.8*((f*37)%7)/7);}p.needsUpdate=true;r.geometry.computeVertexNormals();}
+  else if(p.array[0]!==bp[0]||p.array[1]!==bp[1]){p.array.set(bp);p.needsUpdate=true;r.geometry.computeVertexNormals();}
+  const m=r.material;m.emissiveIntensity=i==1?(.02+.08*v):(.06+.25*v);if(i==1)m.emissive.setHex(0x1a3a80);
+ });
+ const fi=s.act>=0?s.act:1,vv=s.act>=0?s.v*dF:0;
+ if(s.act<0){rim1.color.setHex(0xcfe4ff);rim2.color.setHex(0xcfe4ff);rim1.intensity=3.2;rim2.intensity=2.4;}
+ else{rim1.color.setHex(RIM[fi]);rim2.color.setHex(RIM[fi]);rim1.intensity=(fi==1?3.6:1.6)+(fi==1?4:3)*vv;rim2.intensity=(fi==1?2.8:1.0)+(fi==1?3:2.5)*vv;}
+ if(dF>.01&&s.e>.9&&s.act>=0){dia.visible=true;const c=DIA[s.act];dEdge.material.color.setHex(c);dFace.material.color.setHex(c);dEdge2.material.color.setHex(c);
   dEdge.material.opacity=dF*(.32+.25*s.v);dFace.material.opacity=dF*(.035+.04*s.v);dEdge2.material.opacity=dF*(.18+.2*s.v);
   dia.position.set(0,ty,-200);dia.scale.setScalar(150*(1+.1*s.v));dia.rotation.set(0,TT*.25+s.v*.35,0);}
- else dia.visible=false;
  gl.render(sc,cam);}
 window.ready=true;
 </script></body></html>
